@@ -1,49 +1,61 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
+require 'rubygems'
+require 'thor'
 
-options = {}
+class RComp < Thor
 
-opt_parser = OptionParser.new do |opt|
+  # test
+
+  desc "test", "run one or more tests"
+  method_option :all,
+    :default => false,
+    :aliases => "-a",
+    :desc => "run all tests"
+  method_option :verbose,
+    :default => false,
+    :aliases => "-v",
+    :desc => "toggle verbose output"
+
+  def test
+    puts "test #{options.inspect}"
+  end
+
+  # gen
   
-  opt.banner = "Usage: rcomp COMMAND [OPTIONS]"
-  opt.separator ""
-  opt.separator "Commands"
-  opt.separator "  test: run a test"
-  opt.separator "  vdiff: run vimdiff on output/expected"
-  opt.separator "  gen: generate expected output for test"
-  opt.separator "  print: print out a test"
-  opt.separator ""
-  opt.separator "Options"
+  desc "gen", "generate expected output for one or more tests"
+  method_option :all,
+    :default => false,
+    :aliases => "-a",
+    :desc => "generate expected output for all tests without it"
+  method_option :overwrite,
+    :default => false,
+    :alieas => "-O",
+    :desc => "overwrite expected output file for test if present"
 
-  opt.on("-v","--verbose","toggle verbose output") do
-    options[:verbose] = true
+  def gen
+    puts "gen #{options.inspect}"
   end
 
-  opt.on("-a","--all","perform action on all tests") do
-    options[:all] = true
+  # print
+
+  desc "print", "print out the content of a test and its expected output"
+  method_option :result,
+    :default => false,
+    :aliases => "-r",
+    :desc => "print out the test result in addition to the test content and expected output"
+
+  def print
+    puts "print #{options.inspect}"
   end
 
-  opt.on("-O","--overwrite","overwrite expected output of test") do
-    options[:overwrite] = true
-  end
+  # vdiff
 
-  opt.on("-h","--help","help") do
-    puts opt_parser
+  desc "vdiff", "vimdiff a test's expected and actual result"
+
+  def vdiff
+    puts "vdiff #{options.inspect}"
   end
 end
-
-opt_parser.parse!
-
-case ARGV[0]
-when "test"
-  puts "test"
-when "vdiff"
-  puts "vdiff"
-when "gen"
-  puts "gen"
-when "print"
-  puts "print"
-else
-  puts opt_parser
-end
+  
+RComp.start
