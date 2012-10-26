@@ -6,10 +6,10 @@ class RComp < Thor
     super
     
     @config = {}
-    @config[:directory] = File.expand_path('rcomp')
+    @config[:directory] = File.absolute_path('rcomp')
 
     if config_file_exists?
-      # read and store in config hash
+
     end
   end
 
@@ -17,37 +17,29 @@ class RComp < Thor
   
   desc "init EXECUTABLE_PATH", "setup rcomp to test specified executable"
 
-  def init(executable_name)
+  def init(executable_path)
     if rcomp_exists?
-      say "rcomp already exists at #{@config[:directory]}", :red
+      say "RComp test directory already exists at #{@config[:directory]}", :red
       exit 1
     end
 
     if config_file_exists?
-      say "rcomp config file already exists", :red
+      say "RComp config file already exists", :red
       exit 1
     end
 
-    if not File.exists?(executable_name)
+    if not File.exists?(executable_path)
       say "cant find #{File.expand_path(executable_name)}", :red
       exit 1
     end
 
-    # setup config file
-    system "touch .rcomp"
+    @config[:executable] = executable_path
 
-    rcomp = File.open(".rcomp", "w")
-
-    rcomp.puts "executable: #{executable_name}"
-    rcomp.puts "test-directory: #{@config[:directory]}"
-
-    # setup test directories
-    system "mkdir #{@config[:directory]}"
-    system "mkdir #{@config[:directory]}/tests"
-    system "mkdir #{@config[:directory]}/expected"
-    system "mkdir #{@config[:directory]}/results"
-
-    say "rcomp initialized in #{@config[:directory]}", :green
+    write_config_file
+    say "Initialized RComp config file at #{File.expand_path(".config")}"
+    create_test_directories
+    say "Initialized empty test directory at #{@config[:directory]}"
+    say "RComp initialized", :green
   end
 
   # test
@@ -132,4 +124,24 @@ class RComp < Thor
   def config_file_exists?
     File.exist?('.rcomp')
   end
+
+  def write_config_file
+    if config_file_exists?
+      config_file = File.open(".rcomp", "w")
+    else
+      config_file = File.new(".rcomp", "w")
+    end
+
+    @config.each do |conf_key, conf_value|
+      config_file.puts "#{conf_key}: #{conf_value}"
+    end
+  end
+
+  def create_test_directories
+    system "mkdir #{@config[:directory]}"
+    system "mkdir #{@config[:directory]}/tests"
+    system "mkdir #{@config[:directory]}/expected"
+    system "mkdir #{@config[:directory]}/results"
+  end
+  
 end
