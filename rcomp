@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+options = {}
+
+opt_parser = OptionParser.new do |opt|
+  
+  opt.banner = "Usage: rcomp COMMAND [OPTIONS]"
+  opt.separator ""
+  opt.separator "Commands"
+  opt.separator "  test: run a test"
+  opt.separator "  vdiff: run vimdiff on output/expected"
+  opt.separator "  gen: generate expected output for test"
+  opt.separator "  print: print out a test"
+  opt.separator ""
+  opt.separator "Options"
+
+  opt.on("-v","--verbose","toggle verbose output") do
+    options[:verbose] = true
+  end
+
+  opt.on("-a","--all","perform action on all tests") do
+    options[:all] = true
+  end
+
+  opt.on("-O","--overwrite","overwrite expected output of test") do
+    options[:overwrite] = true
+  end
+
+  opt.on("-h","--help","help") do
+    puts opt_parser
+  end
+end
+
+opt_parser.parse!
+
+case ARGV[0]
+when "test"
+  puts "test"
+when "vdiff"
+  puts "vdiff"
+when "gen"
+  puts "gen"
+when "print"
+  puts "print"
+else
+  puts opt_parser
+end
