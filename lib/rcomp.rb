@@ -1,21 +1,33 @@
-#!/usr/bin/env ruby
-
-require 'rubygems'
 require 'thor'
 
 class RComp < Thor
 
+  def initialize(args=[], options={}, config={})
+    super
+    
+    @config = {}
+    @config[:directory] = File.expand_path('rcomp')
+
+    if config_file_exists?
+      # read and store in config hash
+    end
+  end
+
   # init
   
   desc "init", "setup rcomp structure in current directory"
-  method_option :verbose,
-    :type => :boolean,
-    :default => false,
-    :aliases => "-v",
-    :desc => "toggle verbose output"
 
   def init
-    puts "init #{options.inspect}"
+    unless rcomp_exists?
+      system "mkdir #{@config[:directory]}"
+      system "mkdir #{@config[:directory]}/tests"
+      system "mkdir #{@config[:directory]}/expected"
+      system "mkdir #{@config[:directory]}/results"
+      say "rcomp initialized in #{@config[:directory]}", :green
+    else
+      say "rcomp already exists at #{@config[:directory]}", :red
+      exit 1
+    end
   end
 
   # test
@@ -90,6 +102,14 @@ class RComp < Thor
   def vdiff(name)
     puts "vdiff #{options.inspect}"
   end
+
+  protected
+
+  def rcomp_exists?
+    File.exist?(@config[:directory])
+  end
+
+  def config_file_exists?
+    File.exist?('.rcomp')
+  end
 end
-  
-RComp.start
