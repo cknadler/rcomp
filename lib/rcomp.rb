@@ -15,19 +15,39 @@ class RComp < Thor
 
   # init
   
-  desc "init", "setup rcomp structure in current directory"
+  desc "init EXECUTABLE_PATH", "setup rcomp to test specified executable"
 
-  def init
-    unless rcomp_exists?
-      system "mkdir #{@config[:directory]}"
-      system "mkdir #{@config[:directory]}/tests"
-      system "mkdir #{@config[:directory]}/expected"
-      system "mkdir #{@config[:directory]}/results"
-      say "rcomp initialized in #{@config[:directory]}", :green
-    else
+  def init(executable_name)
+    if rcomp_exists?
       say "rcomp already exists at #{@config[:directory]}", :red
       exit 1
     end
+
+    if config_file_exists?
+      say "rcomp config file already exists", :red
+      exit 1
+    end
+
+    if not File.exists?(executable_name)
+      say "cant find #{File.expand_path(executable_name)}", :red
+      exit 1
+    end
+
+    # setup config file
+    system "touch .rcomp"
+
+    rcomp = File.open(".rcomp", "w")
+
+    rcomp.puts "executable: #{executable_name}"
+    rcomp.puts "test-directory: #{@config[:directory]}"
+
+    # setup test directories
+    system "mkdir #{@config[:directory]}"
+    system "mkdir #{@config[:directory]}/tests"
+    system "mkdir #{@config[:directory]}/expected"
+    system "mkdir #{@config[:directory]}/results"
+
+    say "rcomp initialized in #{@config[:directory]}", :green
   end
 
   # test
@@ -39,7 +59,7 @@ class RComp < Thor
     :aliases => "-v",
     :desc => "toggle verbose output"
 
-  def test(name)
+  def test(test_name)
     puts "test #{options.inspect}"
   end
 
@@ -65,7 +85,7 @@ class RComp < Thor
     :alieas => "-O",
     :desc => "overwrite expected output file for test if present"
 
-  def gen(name)
+  def gen(test_name)
     puts "gen #{options.inspect}"
   end
 
@@ -91,7 +111,7 @@ class RComp < Thor
     :aliases => "-r",
     :desc => "print out the test result in addition to the test content and expected output"
 
-  def print(name)
+  def print(test_name)
     puts "print #{options.inspect}"
   end
 
@@ -99,7 +119,7 @@ class RComp < Thor
 
   desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
 
-  def vdiff(name)
+  def vdiff(test_name)
     puts "vdiff #{options.inspect}"
   end
 
