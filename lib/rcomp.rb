@@ -15,10 +15,10 @@ class RComp < Thor
 
   # init
   
-  desc "init EXECUTABLE_PATH", "setup rcomp to test specified executable"
+  desc "init EXECUTABLE_PATH", "Setup RComp to test specified executable"
 
   def init(executable_path)
-    if rcomp_exists?
+    if test_directory_exists?
       say "RComp test directory already exists at #{@config[:directory]}", :red
       exit 1
     end
@@ -44,7 +44,7 @@ class RComp < Thor
 
   # test
 
-  desc "test TEST_NAME", "run specified test"
+  desc "test TEST_NAME", "Run specified test"
   method_option :verbose,
     :type => :boolean,
     :default => false,
@@ -57,12 +57,12 @@ class RComp < Thor
 
   # test-all
 
-  desc "test-all", "run all tests"
+  desc "test-all", "Run all tests"
   method_option :verbose,
     :type => :boolean,
     :default => false,
     :aliases => "-v",
-    :desc => "toggle verbose output"
+    :desc => "Toggle verbose output"
 
   def test_all
     puts "test-all #{options.inspect}"
@@ -70,12 +70,12 @@ class RComp < Thor
 
   # gen
   
-  desc "gen TEST_NAME", "generate expected output for one or more tests"
+  desc "gen TEST_NAME", "Generate expected output for one or more tests"
   method_option :overwrite,
     :type => :boolean,
     :default => false,
     :alieas => "-O",
-    :desc => "overwrite expected output file for test if present"
+    :desc => "Overwrite expected output file for test if present"
 
   def gen(test_name)
     puts "gen #{options.inspect}"
@@ -83,12 +83,12 @@ class RComp < Thor
 
   # gen-all
   
-  desc "gen-all", "generate expected output for all tests without it"
+  desc "gen-all", "Generate expected output for all tests without it"
   method_option :overwrite,
     :type => :boolean,
     :default => false,
     :alieas => "-O",
-    :desc => "overwrite expected output file for all tests if present"
+    :desc => "Overwrite expected output file for all tests if present"
 
   def gen_all
     puts "gen-all #{options.inspect}"
@@ -96,12 +96,12 @@ class RComp < Thor
 
   # print
 
-  desc "print TEST_NAME", "print out the content of a test and its expected output"
+  desc "print TEST_NAME", "Print out the content of a test and its expected output"
   method_option :result,
     :type => :boolean,
     :default => false,
     :aliases => "-r",
-    :desc => "print out the test result in addition to the test content and expected output"
+    :desc => "Print out the test result in addition to the test content and expected output"
 
   def print(test_name)
     puts "print #{options.inspect}"
@@ -115,9 +115,33 @@ class RComp < Thor
     puts "vdiff #{options.inspect}"
   end
 
+  # implode
+
+  desc "implode", "Remove all RComp files recursively"
+
+  def implode
+    
+    unless test_directory_exists? || config_file_exists?
+      say "Nothing to implode...", :red
+      exit 1
+    end
+  
+    say "This will destroy all RComp files. Are you sure...? (y/n)"
+    confirm = STDIN.gets.chomp
+
+    if confirm.downcase == "y"
+      system "rm -rf #{@config[:directory]}" if test_directory_exists?
+      system "rm .rcomp" if config_file_exists?
+      say "RComp imploded!", :green
+    else
+      say "Aborting RComp implode...", :red
+      exit 1
+    end
+  end
+
   protected
 
-  def rcomp_exists?
+  def test_directory_exists?
     File.exist?(@config[:directory])
   end
 
