@@ -1,15 +1,28 @@
 require 'thor'
+require 'psych'
+
+###
+# = Overview
+#
+# RComp is a simple test framework for testing command line applications 
+# that require an input file. The tool was designed for testing programming
+# languages but has a wide array of uses.
 
 class RComp < Thor
 
   def initialize(args=[], options={}, config={})
     super
     
-    @config = {}
-    @config[:directory] = File.absolute_path('rcomp')
+    load_default_config
 
     if config_file_exists?
+      config_file = Psych.load(File.open('.rcomp'))
 
+      if config_file
+        config_file.each do |key, value|
+          @config[key] = value if config_keys.include?(key)
+        end
+      end
     end
   end
 
@@ -18,8 +31,9 @@ class RComp < Thor
   desc "init EXECUTABLE_PATH", "Setup RComp to test specified executable"
 
   def init(executable_path)
+
     if test_directory_exists?
-      say "RComp test directory already exists at #{@config[:directory]}", :red
+      say "RComp test directory already exists at #{@config["directory"]}", :red
       exit 1
     end
 
@@ -28,18 +42,16 @@ class RComp < Thor
       exit 1
     end
 
-    if not File.exists?(executable_path)
+    unless File.exists?(executable_path)
       say "cant find #{File.expand_path(executable_name)}", :red
       exit 1
     end
 
-    @config[:executable] = executable_path
+    @config["executable"] = executable_path
 
     write_config_file
-    say "Initialized RComp config file at #{File.expand_path(".config")}"
     create_test_directories
-    say "Initialized empty test directory at #{@config[:directory]}"
-    say "RComp initialized", :green
+    say "RComp successfully initialized", :green
   end
 
   # test
@@ -52,7 +64,8 @@ class RComp < Thor
     :desc => "toggle verbose output"
 
   def test(test_name)
-    puts "test #{options.inspect}"
+    puts "test #{test_name} #{options.inspect}"
+    puts "config: #{@config}"
   end
 
   # test-all
@@ -130,7 +143,7 @@ class RComp < Thor
     confirm = STDIN.gets.chomp
 
     if confirm.downcase == "y"
-      system "rm -rf #{@config[:directory]}" if test_directory_exists?
+      system "rm -rf #{@config["directory"]}" if test_directory_exists?
       system "rm .rcomp" if config_file_exists?
       say "RComp imploded!", :green
     else
@@ -141,8 +154,18 @@ class RComp < Thor
 
   protected
 
+  def config_keys
+    @config_keys ||= ["directory",
+                      "executable"]
+  end
+
+  def load_default_config
+    @config = {}
+    @config["directory"] = File.absolute_path('rcomp')
+  end
+
   def test_directory_exists?
-    File.exist?(@config[:directory])
+    File.exist?(@config["directory"])
   end
 
   def config_file_exists?
@@ -154,18 +177,17 @@ class RComp < Thor
       config_file = File.open(".rcomp", "w")
     else
       config_file = File.new(".rcomp", "w")
+      say "Initialized RComp config file at #{File.expand_path(".config")}"
     end
 
-    @config.each do |conf_key, conf_value|
-      config_file.puts "#{conf_key}: #{conf_value}"
-    end
+    config_file.puts Psych.dump(@config)
   end
 
   def create_test_directories
-    system "mkdir #{@config[:directory]}"
-    system "mkdir #{@config[:directory]}/tests"
-    system "mkdir #{@config[:directory]}/expected"
-    system "mkdir #{@config[:directory]}/results"
+    system "mkdir #{@config["directory"]}"
+    system "mkdir #{@config["directory"]}/tests"
+    system "mkdir #{@config["directory"]}/expected"
+    system "mkdir #{@config["directory"]}/results"
+    say "Initialized empty test directory at #{@config["directory"]}"
   end
-  
 end
