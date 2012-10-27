@@ -43,7 +43,7 @@ class RComp < Thor
     end
 
     unless File.exists?(executable_path)
-      say "cant find #{File.expand_path(executable_name)}", :red
+      say "Cant find #{File.expand_path(executable_path)}", :red
       exit 1
     end
 
@@ -63,9 +63,12 @@ class RComp < Thor
     :aliases => "-v",
     :desc => "toggle verbose output"
 
-  def test(test_name)
-    puts "test #{test_name} #{options.inspect}"
-    puts "config: #{@config}"
+  def test(name)
+
+    unless test_directory_exists? && config_file_exists?
+      say "RConf isn't set up properly. Run rconf init EXECUTABLE_NAME first.", :red
+      exit 1
+    end
   end
 
   # test-all
