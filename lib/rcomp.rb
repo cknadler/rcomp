@@ -1,5 +1,5 @@
 require 'thor'
-require 'psych'
+require 'yaml'
 
 ###
 # = Overview
@@ -16,7 +16,7 @@ class RComp < Thor
     load_default_config
 
     if config_file_exists?
-      config_file = Psych.load(File.open('.rcomp'))
+      config_file = YAML.load_file('.rcomp')
 
       if config_file
         config_file.each do |key, value|
@@ -183,7 +183,7 @@ class RComp < Thor
       say "Initialized RComp config file at #{File.expand_path(".config")}"
     end
 
-    config_file.puts Psych.dump(@config)
+    config_file.puts YAML.dump(@config)
   end
 
   def create_test_directories
