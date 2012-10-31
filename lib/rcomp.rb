@@ -9,14 +9,18 @@ require 'yaml'
 # languages but has a wide array of uses.
 
 class RComp < Thor
+  map "-e" => :set_executable
+  map "-d" => :set_tests_directory
+
+  autoload :Actions, 'rcomp/actions'
+
+  include RComp::Actions
 
   def initialize(args=[], options={}, config={})
     super
     
-    load_default_config
-
-    if config_file_exists?
-      config_file = YAML.load_file('.rcomp')
+    if File.exists? config_path
+      config_file = YAML.load_file config_path
 
       if config_file
         config_file.each do |key, value|
@@ -28,30 +32,39 @@ class RComp < Thor
 
   # init
   
-  desc "init EXECUTABLE_PATH", "Setup RComp to test specified executable"
+  desc "init", "Setup rcomp test directory based on current configuration"
 
-  def init(executable_path)
-
-    if test_directory_exists?
-      say "RComp test directory already exists at #{@config["directory"]}", :red
-      exit 1
-    end
-
-    if config_file_exists?
-      say "RComp config file already exists", :red
-      exit 1
-    end
-
-    unless File.exists?(executable_path)
-      say "Cant find #{File.expand_path(executable_path)}", :red
-      exit 1
-    end
-
-    @config["executable"] = executable_path
+  def init
 
     write_config_file
     create_test_directories
     say "RComp successfully initialized", :green
+  end
+
+  # -e
+
+  desc "set_executable EXECUTABLE_PATH", "Set the path to the executable RComp will test"
+  method_option :overwrite,
+    type: :boolean,
+    default: false,
+    aliases: "-O",
+    desc: "Overwrite the current executable path"
+
+  def set_executable
+
+  end
+
+  # -d
+  
+  desc "set_tests_directory TESTS_DIRECTORY_PATH", "Set the tests directory that RComp will run tests from"
+  method_option :overwrite,
+    type: :boolean,
+    default: false,
+    aliases: "-O",
+    desc: "Overwrite the current test directory path"
+
+  def set_tests_directory
+    
   end
 
   # test
@@ -64,11 +77,8 @@ class RComp < Thor
     :desc => "toggle verbose output"
 
   def test(name)
-
-    unless test_directory_exists? && config_file_exists?
-      say "RConf isn't set up properly. Run rconf init EXECUTABLE_NAME first.", :red
-      exit 1
-    end
+    require_executable_path
+    require_tests_root_path
   end
 
   # test-all
@@ -81,7 +91,8 @@ class RComp < Thor
     :desc => "Toggle verbose output"
 
   def test_all
-    puts "test-all #{options.inspect}"
+    require_executable_path
+    require_tests_root_path
   end
 
   # gen
@@ -94,7 +105,8 @@ class RComp < Thor
     :desc => "Overwrite expected output file for test if present"
 
   def gen(test_name)
-    puts "gen #{options.inspect}"
+    require_executable_path
+    require_tests_root_path
   end
 
   # gen-all
@@ -107,7 +119,8 @@ class RComp < Thor
     :desc => "Overwrite expected output file for all tests if present"
 
   def gen_all
-    puts "gen-all #{options.inspect}"
+    require_executable_path
+    require_tests_root_path
   end
 
   # print
@@ -120,7 +133,8 @@ class RComp < Thor
     :desc => "Print out the test result in addition to the test content and expected output"
 
   def print(test_name)
-    puts "print #{options.inspect}"
+    require_executable_path
+    require_tests_root_path
   end
 
   # vdiff
@@ -128,7 +142,8 @@ class RComp < Thor
   desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
 
   def vdiff(test_name)
-    puts "vdiff #{options.inspect}"
+    require_executable_path
+    require_tests_root_path
   end
 
   # implode
@@ -137,17 +152,17 @@ class RComp < Thor
 
   def implode
     
-    unless test_directory_exists? || config_file_exists?
+    unless File.exist?(tests_root_path) || File.exist?(config_path)
       say "Nothing to implode...", :red
       exit 1
     end
   
-    say "This will destroy all RComp files. Are you sure...? (y/n)"
+    say "This will destroy all RComp files including all tests. Are you sure...? (y/n)"
     confirm = STDIN.gets.chomp
 
     if confirm.downcase == "y"
-      system "rm -rf #{@config["directory"]}" if test_directory_exists?
-      system "rm .rcomp" if config_file_exists?
+      rm_rf tests_root_path
+      rm config_path
       say "RComp imploded!", :green
     else
       say "Aborting RComp implode...", :red
@@ -158,39 +173,82 @@ class RComp < Thor
   protected
 
   def config_keys
-    @config_keys ||= ["directory",
+    @config_keys ||= ["tests_directory",
                       "executable"]
   end
+  
+  # Path getters
 
-  def load_default_config
-    @config = {}
-    @config["directory"] = File.absolute_path('rcomp')
+  def tests_root_path
+    @tests_root_path ||= @config["tests_directory"]
   end
 
-  def test_directory_exists?
-    File.exist?(@config["directory"])
+  def tests_path
+    @tests_path ||= @config["tests_directory"] + "/tests"
   end
 
-  def config_file_exists?
-    File.exist?('.rcomp')
+  def expected_path
+    @expected_path ||= @config["tests_directory"] + "/expected"
   end
 
+  def results_path
+    @results_path ||= @config["tests_directory"] + "/results"
+  end
+
+  def executable_path
+    @executable_path ||= @config["executable"]
+  end
+
+  def config_path
+    @config_path ||= ".rcomp"
+  end
+
+  # File IO
+  
   def write_config_file
-    if config_file_exists?
-      config_file = File.open(".rcomp", "w")
+    if File.exists? config_path
+      config_file = File.open(config_path, "w")
     else
-      config_file = File.new(".rcomp", "w")
-      say "Initialized RComp config file at #{File.expand_path(".config")}"
+      config_file = File.new(config_path, "w")
+      say "Initialized RComp config file at #{config_path}"
     end
 
-    config_file.puts YAML.dump(@config)
+    config_file.puts YAML.dump @config
   end
 
   def create_test_directories
-    system "mkdir #{@config["directory"]}"
-    system "mkdir #{@config["directory"]}/tests"
-    system "mkdir #{@config["directory"]}/expected"
-    system "mkdir #{@config["directory"]}/results"
-    say "Initialized empty test directory at #{@config["directory"]}"
+    mkdir tests_root_path
+    mkdir tests_path
+    mkdir expected_path
+    mkdir results_path
+  end
+
+  # Error checking
+  
+  def require_executable_path
+    unless executable_path
+      say "No executable path present. RComp needs the path to an executable to test.", :red
+      say "Run rcomp config -e EXECUTABLE_PATH to add your executable path.", :red
+      exit 1
+    end
+
+    unless File.exists? executable_path
+      say "Executable doesn't exist at path #{executable_path}.", :red
+      say "Run rcomp config -e EXECUTABLE_PATH to add your executable path.", :red
+      exit 1
+    end
+  end
+
+  def require_tests_root_path
+    unless tests_root_path
+      say "No test directory path present.", :red
+      say "Run rcomp config -d TESTS_PATH to specify where rcomp should store tests.", :red
+      exit 1
+    end
+
+    unless File.exists? test_root_path
+      say "Tests file doesn't exist at path #{test_root_path}.", :red
+      say "Run rcomp init to create the directory at #{test_root_path}.", :red
+    end
   end
 end
