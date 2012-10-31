@@ -92,7 +92,7 @@ class RComp < Thor
 
   # test
 
-  desc "test TEST_NAME", "Run specified test"
+  desc "test PATH", "Run specified test or test directory"
   method_option :verbose,
     :type => :boolean,
     :default => false,
@@ -100,8 +100,7 @@ class RComp < Thor
     :desc => "toggle verbose output"
 
   def test(name)
-    require_executable_path
-    require_tests_root_path
+    require_basic_config
   end
 
   # test-all
@@ -114,8 +113,7 @@ class RComp < Thor
     :desc => "Toggle verbose output"
 
   def test_all
-    require_executable_path
-    require_tests_root_path
+    require_basic_config
   end
 
   # gen
@@ -128,8 +126,7 @@ class RComp < Thor
     :desc => "Overwrite expected output file for test if present"
 
   def gen(test_name)
-    require_executable_path
-    require_tests_root_path
+    require_basic_config
   end
 
   # gen-all
@@ -142,8 +139,7 @@ class RComp < Thor
     :desc => "Overwrite expected output file for all tests if present"
 
   def gen_all
-    require_executable_path
-    require_tests_root_path
+    require_basic_config
   end
 
   # print
@@ -156,8 +152,7 @@ class RComp < Thor
     :desc => "Print out the test result in addition to the test content and expected output"
 
   def print(test_name)
-    require_executable_path
-    require_tests_root_path
+    require_basic_config
   end
 
   # vdiff
@@ -165,8 +160,7 @@ class RComp < Thor
   desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
 
   def vdiff(test_name)
-    require_executable_path
-    require_tests_root_path
+    require_basic_config
   end
 
   # implode
@@ -234,6 +228,19 @@ class RComp < Thor
     ".rcomp"
   end
 
+  # Searching
+  def search_for_file(name)
+    
+  end
+
+  def run_test(path)
+    
+  end
+
+  def run_tests(path)
+
+  end
+
   # File IO
   
   def write_config_file
@@ -256,13 +263,22 @@ class RComp < Thor
 
   # Error checking
   
+  def require_basic_config
+    require_executable_path
+    require_executable_exists
+    require_tests_root_path
+    require_tests_root_exists
+  end
+  
   def require_executable_path
     unless executable_path
       say "No executable path present. RComp needs the path to an executable to test.", :red
       say "Run rcomp -e PATH to add your executable path.", :red
       exit 1
     end
+  end
 
+  def require_executable_exists
     unless File.exists? executable_path
       say "Executable doesn't exist at path #{executable_path}.", :red
       say "Run rcomp -e PATH to add your executable path.", :red
@@ -276,10 +292,13 @@ class RComp < Thor
       say "Run rcomp -d PATH to specify where rcomp should store tests.", :red
       exit 1
     end
+  end
 
+  def require_tests_root_exists
     unless File.exists? tests_root_path
       say "Tests file doesn't exist at path #{tests_root_path}.", :red
       say "Run rcomp init to create the directory at #{tests_root_path}.", :red
+      exit 1
     end
   end
 end
