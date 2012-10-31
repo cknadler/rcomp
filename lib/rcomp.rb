@@ -134,15 +134,23 @@ class RComp < Thor
       end
     end
 
+    failed = 0
+    passed = 0
+
     tests.each do |test|
       test_path = test.gsub(tests_path, '')
       run_test test_path
-      if test_passes? test_path
-        # output test passes
+      if test_passed? test_path
+        say "Passed: #{test_path.slice(0)}", :green
+        passed += 1
       else
-        # output test failure
+        say "Failed: #{test_path.slice(0)}", :red
+        failed += 1
       end
     end
+
+    say "Passed #{passed} tests", :green
+    say "Failed #{failed} tests", :red
   end
 
   # gen
@@ -261,10 +269,10 @@ class RComp < Thor
   
   def run_test(path)
     unless result_file_exists? path
-      FileUtils.mkpath(File.dirname(path))
+      FileUtils.mkpath(File.expand_path(results_path + path))
     end
 
-    system "#{executable_path} #{tests_path + path} > #{results_path + path}"
+    puts "#{executable_path} #{tests_path + path} > #{results_path + path}"
   end
 
   def test_passed?(path)
