@@ -277,9 +277,9 @@ class RComp < Thor
       exit 1
     end
 
-    unless File.exists? test_root_path
-      say "Tests file doesn't exist at path #{test_root_path}.", :red
-      say "Run rcomp init to create the directory at #{test_root_path}.", :red
+    unless File.exists? tests_root_path
+      say "Tests file doesn't exist at path #{tests_root_path}.", :red
+      say "Run rcomp init to create the directory at #{tests_root_path}.", :red
     end
   end
 end
