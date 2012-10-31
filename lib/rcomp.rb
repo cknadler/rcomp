@@ -35,15 +35,14 @@ class RComp < Thor
   desc "init", "Setup rcomp test directory based on current configuration"
 
   def init
-
-    write_config_file
+    require_tests_root_path
     create_test_directories
     say "RComp successfully initialized", :green
   end
 
   # -e
 
-  desc "set_executable EXECUTABLE_PATH", "Set the path to the executable RComp will test"
+  desc "set_executable PATH", "Set the path to the executable RComp will test"
   method_option :overwrite,
     type: :boolean,
     default: false,
@@ -51,12 +50,12 @@ class RComp < Thor
     desc: "Overwrite the current executable path"
 
   def set_executable
-
+    write_config_file
   end
 
   # -d
   
-  desc "set_tests_directory TESTS_DIRECTORY_PATH", "Set the tests directory that RComp will run tests from"
+  desc "set_tests_directory PATH", "Set the tests directory that RComp will run tests from"
   method_option :overwrite,
     type: :boolean,
     default: false,
