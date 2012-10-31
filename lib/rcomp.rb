@@ -40,6 +40,9 @@ class RComp < Thor
   def init
     require_tests_root_path
     create_test_directories
+
+    ## FIX: add logic to check if all files already exist
+    
     say "RComp successfully initialized", :green
   end
 
@@ -117,7 +120,7 @@ class RComp < Thor
     require_basic_config
     
     tests = []
-
+    
     # Find all tests in the tests directory
     Find.find(tests_path) do |path|
       if FileTest.directory?(path)
@@ -132,7 +135,13 @@ class RComp < Thor
     end
 
     tests.each do |test|
-      run_test test
+      test_path = test.gsub(tests_path, '')
+      run_test test_path
+      if test_passes? test_path
+        # output test passes
+      else
+        # output test failure
+      end
     end
   end
 
@@ -249,9 +258,35 @@ class RComp < Thor
   end
 
   # Testing
-
+  
   def run_test(path)
-    
+    unless result_file_exists? path
+      FileUtils.mkpath(File.dirname(path))
+    end
+
+    system "#{executable_path} #{tests_path + path} > #{results_path + path}"
+  end
+
+  def test_passed?(path)
+    unless expected_file_exists? path
+      say "No expected output for test #{path}.", :red
+      say "Create one manually or run rcomp gen #{path}.", :red
+      return false
+    end
+
+    if File.identical?(results_path + path, expected_path + path)
+      true
+    else
+      false
+    end
+  end
+
+  def expected_file_exists?(path)
+    File.exists?(expected_path + path)
+  end
+
+  def result_file_exists?(path)
+    File.exists?(results_path + path)
   end
   
   def ignored_directory?(name)
@@ -285,6 +320,7 @@ class RComp < Thor
     require_executable_exists
     require_tests_root_path
     require_tests_root_exists
+    require_tests_subdirs
   end
   
   def require_executable_path
@@ -315,6 +351,14 @@ class RComp < Thor
     unless File.exists? tests_root_path
       say "Tests file doesn't exist at path #{tests_root_path}.", :red
       say "Run rcomp init to create the directory at #{tests_root_path}.", :red
+      exit 1
+    end
+  end
+
+  def require_tests_subdirs
+    unless File.exists?(tests_path) && File.exists?(results_path) && File.exists?(expected_path)
+      say "Tests path subdirectories not initilized inside #{tests_root_path}.", :red
+      say "Run rcomp init to create the require subdirectories in #{tests_root_path}.", :red
       exit 1
     end
   end
