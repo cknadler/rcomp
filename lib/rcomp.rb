@@ -233,7 +233,7 @@ class RComp < Thor
 
     unless File.exists? executable_path
       say "Executable doesn't exist at path #{executable_path}.", :red
-      say "Run rcomp config -e EXECUTABLE_PATH to add your executable path.", :red
+      say "Run rcomp -e PATH to add your executable path.", :red
       exit 1
     end
   end
@@ -241,7 +241,7 @@ class RComp < Thor
   def require_tests_root_path
     unless tests_root_path
       say "No test directory path present.", :red
-      say "Run rcomp config -d TESTS_PATH to specify where rcomp should store tests.", :red
+      say "Run rcomp -d PATH to specify where rcomp should store tests.", :red
       exit 1
     end
 
