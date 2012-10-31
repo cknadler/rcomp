@@ -1,5 +1,6 @@
 require 'thor'
 require 'yaml'
+require 'find'
 
 ###
 # = Overview
@@ -114,6 +115,25 @@ class RComp < Thor
 
   def test_all
     require_basic_config
+    
+    tests = []
+
+    # Find all tests in the tests directory
+    Find.find(tests_path) do |path|
+      if FileTest.directory?(path)
+        if ignored_directory? File.basename(path)[0]
+          Find.prune # Don't look any further into this directory.
+        else
+          next
+        end
+      else
+        tests << path
+      end
+    end
+
+    tests.each do |test|
+      run_test test
+    end
   end
 
   # gen
@@ -228,17 +248,14 @@ class RComp < Thor
     ".rcomp"
   end
 
-  # Searching
-  def search_for_file(name)
-    
-  end
+  # Testing
 
   def run_test(path)
     
   end
-
-  def run_tests(path)
-
+  
+  def ignored_directory?(name)
+    (name == '.') || (name == '..') 
   end
 
   # File IO
