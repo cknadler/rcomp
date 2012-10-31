@@ -18,12 +18,14 @@ class RComp < Thor
 
   def initialize(args=[], options={}, config={})
     super
+
+    @config = {}
     
     if File.exists? config_path
-      config_file = YAML.load_file config_path
+      config_hash = YAML.load_file config_path
 
-      if config_file
-        config_file.each do |key, value|
+      if config_hash
+        config_hash.each do |key, value|
           @config[key] = value if config_keys.include?(key)
         end
       end
@@ -49,8 +51,19 @@ class RComp < Thor
     aliases: "-O",
     desc: "Overwrite the current executable path"
 
-  def set_executable
+  def set_executable(path)
+
+    if executable_path
+      unless @options[:overwrite]
+        say "executable key exists in config file.", :red
+        say "Run rcomp -e -O PATH to overwrite.", :red
+        exit 1
+      end
+    end
+
+    set_executable_path path
     write_config_file
+    say "Rcomp successfully set executable path to #{executable_path}.", :green
   end
 
   # -d
@@ -62,8 +75,19 @@ class RComp < Thor
     aliases: "-O",
     desc: "Overwrite the current test directory path"
 
-  def set_tests_directory
-    
+  def set_tests_directory(path)
+
+    if tests_root_path
+      unless @options[:overwrite]
+        say "tests_directory key exists in config file.", :red
+        say "Run rcomp -d -O PATH to overwrite.", :red
+        exit 1
+      end
+    end
+
+    set_tests_root_path path
+    write_config_file
+    say "RComp successfully set tests directory path to #{tests_root_path}.", :green
   end
 
   # test
@@ -169,7 +193,7 @@ class RComp < Thor
     end
   end
 
-  protected
+  private
 
   def config_keys
     @config_keys ||= ["tests_directory",
@@ -179,27 +203,35 @@ class RComp < Thor
   # Path getters
 
   def tests_root_path
-    @tests_root_path ||= @config["tests_directory"]
+    @config["tests_directory"]
+  end
+
+  def set_tests_root_path(path)
+    @config["tests_directory"] = path
   end
 
   def tests_path
-    @tests_path ||= @config["tests_directory"] + "/tests"
+    tests_root_path + "/tests"
   end
 
   def expected_path
-    @expected_path ||= @config["tests_directory"] + "/expected"
+    tests_root_path + "/expected"
   end
 
   def results_path
-    @results_path ||= @config["tests_directory"] + "/results"
+    tests_root_path + "/results"
   end
 
   def executable_path
-    @executable_path ||= @config["executable"]
+    @config["executable"]
+  end
+
+  def set_executable_path(path)
+    @config["executable"] = path
   end
 
   def config_path
-    @config_path ||= ".rcomp"
+    ".rcomp"
   end
 
   # File IO
@@ -227,7 +259,7 @@ class RComp < Thor
   def require_executable_path
     unless executable_path
       say "No executable path present. RComp needs the path to an executable to test.", :red
-      say "Run rcomp config -e EXECUTABLE_PATH to add your executable path.", :red
+      say "Run rcomp -e PATH to add your executable path.", :red
       exit 1
     end
 
