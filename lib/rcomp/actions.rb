@@ -21,5 +21,19 @@ class RComp
         say "Created #{path}"
       end
     end
+
+    def touch(path)
+      unless File.exist? path
+        FileUtils.touch path
+        say "Created #{path}"
+      end
+    end
+
+    def write_config_file
+      touch '.config'
+
+      config_file = File.open '.config'
+      config_file.puts YAML.dump data
+    end
   end
 end
