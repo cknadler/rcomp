@@ -99,13 +99,21 @@ class RComp < Thor
   def test(name)
     require_basic_conf
 
-    Find.find(tests_path) do |path|
-      if File.basename(path, ".*") == name
-        if FileTest.directory?(path)
-          
-        else
+    test_path = tests_path + name
 
-        end
+    unless File.exists? test_path
+      say "Test #{test_path} not found", :red
+      exit 1
+    end
+
+    if File.directory? test_path
+      run_tests test_path
+    else
+      if run_test(test_path)
+        say "\nAll tests passed!\n", :green
+      else
+        puts "\n"
+        exit 1
       end
     end
   end
@@ -234,6 +242,7 @@ class RComp < Thor
 
     if failed > 0
       say "\nFailed #{failed} #{failed > 1 ? "tests" : "test"}\n", :red
+      exit 1
     else
       say "\nAll tests passed!\n", :green
     end
