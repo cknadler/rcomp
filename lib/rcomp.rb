@@ -96,20 +96,20 @@ class RComp < Thor
     :aliases => "-v",
     :desc => "toggle verbose output"
 
-  def test(name)
+  def test(path)
     require_basic_conf
 
-    test_path = tests_path + name
+    test = tests_path + path
 
-    unless File.exists? test_path
-      say "Test #{test_path} not found", :red
+    unless File.exists? test
+      say "Test #{test} not found", :red
       exit 1
     end
 
     if File.directory? test_path
-      run_tests test_path
+      run_tests test
     else
-      if run_test(test_path)
+      if run_test test
         say "\nAll tests passed!\n", :green
       else
         puts "\n"
