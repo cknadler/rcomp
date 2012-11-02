@@ -19,3 +19,6 @@ doc/
 
 # RComp files
 .rcomp
+
+# simplecov
+coverage
