@@ -7,6 +7,6 @@ group :development do
   gem "rdoc", "~> 3.12"
   gem "jeweler", "~> 1.8.4"
   gem "bundler", "~> 1.2.1"
-  gem "minitest", "~> 3.5.0"
+  gem "minitest", "~> 4.1.0"
   gem "simplecov"
 end
