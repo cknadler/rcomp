@@ -205,8 +205,26 @@ class RComp < Thor
     :aliases => "-r",
     :desc => "Print out the test result in addition to the test content and expected output"
 
-  def print(test_name)
+  def print(name)
     require_basic_conf
+
+    test = tests_path + name
+
+    unless File.exists? test
+      say "Test doesn't exit at #{name}", :red
+      exit 1
+    end
+
+    if File.directory? test
+      say "Bad argument, can't print directory #{name}", :red
+      exit 1
+    end
+
+    say "Printing test #{name}:", :yellow
+
+    File.open(test).each do |line|
+      puts line
+    end
   end
 
   # vdiff
