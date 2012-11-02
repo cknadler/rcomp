@@ -133,7 +133,7 @@ class RComp < Thor
   method_option :overwrite,
     :type => :boolean,
     :default => false,
-    :alieas => "-O",
+    :aliases => "-O",
     :desc => "Overwrite expected output file for test if present"
 
   def gen(path)
@@ -169,11 +169,31 @@ class RComp < Thor
   method_option :overwrite,
     :type => :boolean,
     :default => false,
-    :alieas => "-O",
+    :aliases => "-O",
     :desc => "Overwrite expected output file for all tests if present"
 
   def gen_all
     require_basic_conf
+
+    Find.find(tests_path) do |path|
+      rel_path = path.gsub(tests_path, '')
+      expected = output_path(expected_path + rel_path)
+      test = tests_path + rel_path
+      if File.directory? path
+        next
+      else
+        FileUtils.mkpath(File.dirname(expected)) unless File.exists?(File.dirname(expected))
+        if File.exists? expected 
+          if @options[:overwrite]
+            system "#{executable_path} #{test} > #{expected}"
+            say "Overwrote expected output for #{rel_path}", :yellow
+          end
+        else
+          system "#{executable_path} #{test} > #{expected}"
+          say "Generated expected output for #{rel_path}", :green
+        end
+      end
+    end
   end
 
   # print
