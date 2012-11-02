@@ -1,8 +1,0 @@
-rcomp
-=====
-
-{<img src="https://codeclimate.com/badge.png" alt="Dependency Status" />}[https://codeclimate.com/github/cknadler/rcomp]
-
-{<img src="https://gemnasium.com/cknadler/rcomp.png" alt="Dependency Status" />}[https://gemnasium.com/cknadler/rcomp]
-
-simple testing for command line applications
