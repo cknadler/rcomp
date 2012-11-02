@@ -231,8 +231,23 @@ class RComp < Thor
 
   desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
 
-  def vdiff(test_name)
+  def vdiff(name)
     require_basic_conf
+
+    result = output_path(results_path + name)
+    expected = output_path(expected_path + name)
+
+    unless File.exists? result
+      say "No result for test #{name}", :red
+      exit 1
+    end
+
+    unless File.exist? expected
+      say "No expected output for test #{name}", :red
+      exit 1
+    end
+
+    system "vimdiff #{expected} #{result}"
   end
 
   # implode
