@@ -52,15 +52,15 @@ class RComp < Thor
 
     if executable_path
       unless @options[:overwrite]
-        say "executable key exists in config file.", :red
-        say "Run rcomp -e -O PATH to overwrite.", :red
+        say "executable key exists in config file", :red
+        say "Run rcomp -e -O PATH to overwrite", :red
         exit 1
       end
     end
 
     set_executable_path path
     write_conf
-    say "Rcomp successfully set executable path to #{executable_path}.", :green
+    say "Rcomp successfully set executable path to #{executable_path}", :green
   end
 
   # -d
@@ -76,15 +76,15 @@ class RComp < Thor
 
     if tests_root_path
       unless @options[:overwrite]
-        say "tests_directory key exists in config file.", :red
-        say "Run rcomp -d -O PATH to overwrite.", :red
+        say "tests_directory key exists in config file", :red
+        say "Run rcomp -d -O PATH to overwrite", :red
         exit 1
       end
     end
 
     set_tests_root_path path
     write_conf
-    say "RComp successfully set tests directory path to #{tests_root_path}.", :green
+    say "RComp successfully set tests directory path to #{tests_root_path}", :green
   end
 
   # test
@@ -129,15 +129,38 @@ class RComp < Thor
 
   # gen
   
-  desc "gen TEST_NAME", "Generate expected output for one or more tests"
+  desc "gen PATH", "Generate expected output for test(s)"
   method_option :overwrite,
     :type => :boolean,
     :default => false,
     :alieas => "-O",
     :desc => "Overwrite expected output file for test if present"
 
-  def gen(test_name)
+  def gen(path)
     require_basic_conf
+
+    expected = output_path(expected_path + path)
+    test = tests_path + path
+    
+    if File.exists? expected
+      unless @options[:overwrite]
+        say "Expected for #{path} already exists", :red
+        say "Run rcomp gen -O #{path} to overwrite", :red
+        exit 1
+      end
+    end
+
+    FileUtils.mkpath(File.dirname(expected)) unless File.exists?(expected)
+
+    unless File.exists? test
+      say "No test #{path}", :red
+      say "Can't generate expected result", :red
+      exit 1
+    end
+  
+    system "#{executable_path} #{test} > #{expected}"
+
+    say "Generated expected output for #{path}", :green
   end
 
   # gen-all
