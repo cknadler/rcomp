@@ -102,7 +102,7 @@ class RComp < Thor
     Find.find(tests_path) do |path|
       if File.basename(path, ".*") == name
         if FileTest.directory?(path)
-           
+          
         else
 
         end
@@ -121,39 +121,7 @@ class RComp < Thor
 
   def test_all
     require_basic_conf
-    
-    tests = []
-    
-    # Find all tests in the tests directory
-    Find.find(tests_path) do |path|
-      if FileTest.directory?(path)
-        if ignored_directory? File.basename(path)[0]
-          Find.prune # Don't look any further into this directory.
-        else
-          next
-        end
-      else
-        tests << path
-      end
-    end
-
-    failed = 0
-    passed = 0
-
-    tests.each do |test|
-      test_path = test.gsub(tests_path, '')
-      run_test test_path
-      if test_passed? test_path
-        say "Passed: #{test_path.slice(0)}", :green
-        passed += 1
-      else
-        say "Failed: #{test_path.slice(0)}", :red
-        failed += 1
-      end
-    end
-
-    say "Passed #{passed} tests", :green
-    say "Failed #{failed} tests", :red
+    run_tests tests_path
   end
 
   # gen
@@ -233,39 +201,62 @@ class RComp < Thor
   # Testing
   
   def run_test(path)
-    unless result_file_exists? path
-      FileUtils.mkpath(File.expand_path(results_path + path))
-    end
+    
+    rel_path = path.gsub(tests_path, '')
+    rel_path[0] = ''
 
-    puts "#{executable_path} #{tests_path + path} > #{results_path + path}"
+    expected = expected_path + '/' + rel_path
+    expected = File.dirname(expected) + '/' + File.basename(expected, '.*') + '.out'
+    result = results_path + '/' + rel_path
+    result = File.dirname(result) + '/' + File.basename(result, '.*') + '.out'
+    
+    return test_stubbed(rel_path) unless File.exists?(expected)
+
+    FileUtils.mkpath(File.dirname(result)) unless File.exists?(result)
+
+    system "#{executable_path} #{path} > #{result}"
+
+    FileUtils.identical?(expected, result) ? 
+      test_passed(rel_path) : test_failed(rel_path)
   end
 
   def run_tests(directory)
-    
-  end
 
-  def test_passed?(path)
-    unless expected_file_exists? path
-      say "No expected output for test #{path}.", :red
-      say "Create one manually or run rcomp gen #{path}.", :red
-      return false
+    say "Running all tests in #{directory}\n\n"
+
+    passed = 0
+    failed = 0
+
+    Find.find(directory) do |path|
+      if FileTest.directory?(path)
+        next
+      else
+        run_test(path) ? passed += 1 : failed += 1
+      end
     end
 
-    if File.identical?(results_path + path, expected_path + path)
-      true
+    if failed > 0
+      say "\nFailed #{failed} #{failed > 1 ? "tests" : "test"}\n", :red
     else
-      false
+      say "\nAll tests passed!\n", :green
     end
   end
 
-  def expected_file_exists?(path)
-    File.exists?(expected_path + path)
+  def test_stubbed(path)
+    say "Missing expected output for #{path}", :yellow
+    return false
   end
 
-  def result_file_exists?(path)
-    File.exists?(results_path + path)
+  def test_passed(path)
+    say "Passed #{path}", :green
+    return true
   end
-  
+
+  def test_failed(path)
+    say "Failed #{path}", :red
+    return false
+  end
+
   def create_test_directories
     mkdir tests_root_path
     mkdir tests_path
