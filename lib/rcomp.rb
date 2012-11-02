@@ -90,11 +90,6 @@ class RComp < Thor
   # test
 
   desc "test PATH", "Run specified test or test directory"
-  method_option :verbose,
-    :type => :boolean,
-    :default => false,
-    :aliases => "-v",
-    :desc => "toggle verbose output"
 
   def test(path)
     require_basic_conf
