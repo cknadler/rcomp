@@ -203,12 +203,9 @@ class RComp < Thor
   def run_test(path)
     
     rel_path = path.gsub(tests_path, '')
-    rel_path[0] = ''
 
-    expected = expected_path + '/' + rel_path
-    expected = File.dirname(expected) + '/' + File.basename(expected, '.*') + '.out'
-    result = results_path + '/' + rel_path
-    result = File.dirname(result) + '/' + File.basename(result, '.*') + '.out'
+    expected = output_path(expected_path + rel_path)
+    result = output_path(results_path + rel_path)
     
     return test_stubbed(rel_path) unless File.exists?(expected)
 
@@ -255,6 +252,10 @@ class RComp < Thor
   def test_failed(path)
     say "Failed #{path}", :red
     return false
+  end
+
+  def output_path(path)
+    File.dirname(path) + '/' + File.basename(path, '.*') + '.out'
   end
 
   def create_test_directories

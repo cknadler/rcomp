@@ -41,15 +41,15 @@ class RComp
     end
 
     def tests_path
-      tests_root_path + '/tests'
+      tests_root_path + '/tests/'
     end
 
     def expected_path
-      tests_root_path + '/expected'
+      tests_root_path + '/expected/'
     end
 
     def results_path
-      tests_root_path + '/results'
+      tests_root_path + '/results/'
     end
 
     def executable_path
