@@ -1,4 +1,5 @@
 # RComp [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/cknadler/rcomp) [![Dependency Status](https://gemnasium.com/cknadler/rcomp.png)](https://gemnasium.com/cknadler/rcomp) [![Build Status](https://travis-ci.org/cknadler/rcomp.png)](https://travis-ci.org/cknadler/rcomp)
+---
 
 RComp is a simple way to test command line applications, particularly parsers and compilers.
 
@@ -61,20 +62,20 @@ __results__: Managed by RComp. Stores the results of running your test against y
 Run a specific test. If passed a directory, it will run all tests in that directory and all subdirectories.
 
 ```
-rcomp test hashing.c
+rcomp test integration
 ```
 
-RComp searches for tests in your tests directory. For example, lets say your tests directory is `rcomp` and you have a test `rcomp/tests/integration/hashing.c`.
+You can also pass it the relative path to a specific test.
 
-You can run that test in the following ways:
+```
+rcomp test integration/hashing.c
+```
 
-`rcomp test integration/hashing.c`
+The file extension is optional.
 
-`rcomp test integration/hashing`
-
-`rcomp test hasing.c`
-
-`rcomp test hashing`
+```
+rcomp test integration/hashing
+```
 
 #### `test-all`:
 
