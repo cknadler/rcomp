@@ -151,6 +151,18 @@ class RComp < Thor
 
   def gen_all
     require_basic_conf
+
+    if @options[:overwrite]
+      say "This will overwrite all existing expected results."
+      print "Are you sure? (Y/N) "
+      confirm = STDIN.gets.chomp
+
+      unless confirm.downcase == 'y'
+        say "Aborting gen-all...", :red
+        exit 1
+      end
+    end
+
     run_tests tests_path, true, @options[:overwrite]
   end
 
@@ -184,20 +196,20 @@ class RComp < Thor
   def implode
 
     unless File.exists? conf_path
-      say "Nothing to implode", :red
+      say 'Nothing to implode', :red
       exit 1
     end
   
-    puts "This will destroy all RComp files including all tests."
-    print "Are you sure? (Y/N) "
+    puts 'This will destroy all RComp files including all tests.'
+    print 'Are you sure? (Y/N) '
     confirm = STDIN.gets.chomp
 
-    if confirm.downcase == "y"
+    if confirm.downcase == 'y'
       rm_rf tests_root_path if tests_root_path
       rm conf_path
-      say "RComp imploded!", :green
+      say 'RComp imploded!', :green
     else
-      say "Aborting RComp implode...", :red
+      say 'Aborting implode...', :red
       exit 1
     end
   end
