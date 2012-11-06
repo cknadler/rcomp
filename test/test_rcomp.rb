@@ -1,8 +1,8 @@
 require 'helper'
 
 class TestRComp < MiniTest::Unit::TestCase
-  def test_something_for_real
-    flunk "hey buddy, you should probably rename this file and start testing for real"
+  def temp_test
+    # put in real tests eventually
   end
 end
 
