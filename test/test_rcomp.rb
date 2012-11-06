@@ -1,8 +1,12 @@
 require 'helper'
 
 class TestRComp < MiniTest::Unit::TestCase
-  def temp_test
-    # put in real tests eventually
+  def test_temp
+    skip "Test eventually"
+  end
+
+  def test_temp2
+    true
   end
 end
 
