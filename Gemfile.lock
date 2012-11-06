@@ -1,6 +1,7 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    fakefs (0.4.0)
     git (1.2.5)
     jeweler (1.8.4)
       bundler (~> 1.0)
@@ -27,6 +28,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (> 1.0.0)
+  fakefs
   jeweler (~> 1.8.4)
   minitest (~> 4.2.0)
   mocha (~> 0.12.7)

@@ -9,6 +9,7 @@ group :development do
   gem "bundler", "> 1.0.0"
   gem "minitest", "~> 4.2.0"
   gem "mocha", "~> 0.12.7", require: false
+  gem "fakefs", "~> 0.4.0"
   gem "simplecov"
 end
 
@@ -17,4 +18,5 @@ group :test do
   gem "bundler", "> 1.0.0"
   gem "minitest", "~> 4.2.0"
   gem "mocha", "~> 0.12.7", require: false
+  gem "fakefs", "~> 0.4.0"
 end
