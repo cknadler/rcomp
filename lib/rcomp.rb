@@ -154,34 +154,6 @@ class RComp < Thor
     run_tests tests_path, true, @options[:overwrite]
   end
 
-  # print
-
-  desc "print TEST_NAME", "Print out the content of a test and its expected output"
-  method_option :result,
-    :type => :boolean,
-    :default => false,
-    :aliases => "-r",
-    :desc => "Print out the test result in addition to the test content and expected output"
-
-  def print(name)
-    require_basic_conf
-
-    test = tests_path + name
-
-    print_test_missing test unless File.exists? test
-
-    if File.directory? test
-      say "Bad argument, can't print directory #{name}", :red
-      exit 1
-    end
-
-    say "Printing test #{name}:", :yellow
-
-    File.open(test).each do |line|
-      say line
-    end
-  end
-
   # vdiff
 
   desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
@@ -207,22 +179,22 @@ class RComp < Thor
 
   # implode
 
-  desc "implode", "Remove all RComp files recursively"
+  desc "implode", "Remove ALL RComp files including tests"
 
   def implode
 
     unless File.exists? conf_path
       say "Nothing to implode", :red
-      say "Aborting...", :red
       exit 1
     end
   
-    say "This will destroy all RComp files including all tests. Are you sure...? (y/n)"
+    puts "This will destroy all RComp files including all tests."
+    print "Are you sure? (Y/N) "
     confirm = STDIN.gets.chomp
 
     if confirm.downcase == "y"
       rm_rf tests_root_path if tests_root_path
-      rm conf_path if conf_path
+      rm conf_path
       say "RComp imploded!", :green
     else
       say "Aborting RComp implode...", :red
