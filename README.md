@@ -4,7 +4,7 @@ RComp is a simple way to test command line applications, particularly parsers an
 
 ## Installation
 
-To get started, install rcomp:
+To get started, install RComp:
 
 ```
 gem install rcomp

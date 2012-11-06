@@ -16,10 +16,12 @@ class RComp < Thor
   autoload :Actions, 'rcomp/actions'
   autoload :Conf, 'rcomp/conf'
   autoload :Test, 'rcomp/test'
+  autoload :Helper, 'rcomp/helper'
 
   include RComp::Actions
   include RComp::Conf
   include RComp::Test
+  include RComp::Helper
 
   def initialize(args=[], options={}, config={})
     super
@@ -94,23 +96,11 @@ class RComp < Thor
   def test(path)
     require_basic_conf
 
+    # NOTE: Add logic for ignoring file extensions here
+    # It could go elsewhere, possibly in a module
+    
     test = tests_path + path
-
-    unless File.exists? test
-      say "Test #{test} not found", :red
-      exit 1
-    end
-
-    if File.directory? test_path
-      run_tests test
-    else
-      if run_test test
-        say "\nAll tests passed!\n", :green
-      else
-        puts "\n"
-        exit 1
-      end
-    end
+    run_tests test
   end
 
   # test-all
@@ -138,29 +128,12 @@ class RComp < Thor
 
   def gen(path)
     require_basic_conf
-
-    expected = output_path(expected_path + path)
-    test = tests_path + path
     
-    if File.exists? expected
-      unless @options[:overwrite]
-        say "Expected for #{path} already exists", :red
-        say "Run rcomp gen -O #{path} to overwrite", :red
-        exit 1
-      end
-    end
+    # NOTE: Add logic for ignoring file extensions here
+    # It could go elsewhere, possibly in a module
 
-    FileUtils.mkpath(File.dirname(expected)) unless File.exists?(expected)
-
-    unless File.exists? test
-      say "No test #{path}", :red
-      say "Can't generate expected result", :red
-      exit 1
-    end
-  
-    system "#{executable_path} #{test} > #{expected}"
-
-    say "Generated expected output for #{path}", :green
+    test = tests_path + path
+    run_tests test, true, @options[:overwrite]
   end
 
   # gen-all
@@ -174,26 +147,7 @@ class RComp < Thor
 
   def gen_all
     require_basic_conf
-
-    Find.find(tests_path) do |path|
-      rel_path = path.gsub(tests_path, '')
-      expected = output_path(expected_path + rel_path)
-      test = tests_path + rel_path
-      if File.directory? path
-        next
-      else
-        FileUtils.mkpath(File.dirname(expected)) unless File.exists?(File.dirname(expected))
-        if File.exists? expected 
-          if @options[:overwrite]
-            system "#{executable_path} #{test} > #{expected}"
-            say "Overwrote expected output for #{rel_path}", :yellow
-          end
-        else
-          system "#{executable_path} #{test} > #{expected}"
-          say "Generated expected output for #{rel_path}", :green
-        end
-      end
-    end
+    run_tests tests_path, true, @options[:overwrite]
   end
 
   # print
@@ -210,10 +164,7 @@ class RComp < Thor
 
     test = tests_path + name
 
-    unless File.exists? test
-      say "Test doesn't exit at #{name}", :red
-      exit 1
-    end
+    print_test_missing test unless File.exists? test
 
     if File.directory? test
       say "Bad argument, can't print directory #{name}", :red
@@ -223,7 +174,7 @@ class RComp < Thor
     say "Printing test #{name}:", :yellow
 
     File.open(test).each do |line|
-      puts line
+      say line
     end
   end
 
@@ -276,67 +227,6 @@ class RComp < Thor
   end
 
   private
-
-  # Testing
-  
-  def run_test(path)
-    
-    rel_path = path.gsub(tests_path, '')
-
-    expected = output_path(expected_path + rel_path)
-    result = output_path(results_path + rel_path)
-    
-    return test_stubbed(rel_path) unless File.exists?(expected)
-
-    FileUtils.mkpath(File.dirname(result)) unless File.exists?(result)
-
-    system "#{executable_path} #{path} > #{result}"
-
-    FileUtils.identical?(expected, result) ? 
-      test_passed(rel_path) : test_failed(rel_path)
-  end
-
-  def run_tests(directory)
-
-    say "Running all tests in #{directory}\n\n"
-
-    passed = 0
-    failed = 0
-
-    Find.find(directory) do |path|
-      if FileTest.directory?(path)
-        next
-      else
-        run_test(path) ? passed += 1 : failed += 1
-      end
-    end
-
-    if failed > 0
-      say "\nFailed #{failed} #{failed > 1 ? "tests" : "test"}\n", :red
-      exit 1
-    else
-      say "\nAll tests passed!\n", :green
-    end
-  end
-
-  def test_stubbed(path)
-    say "Missing expected output for #{path}", :yellow
-    return false
-  end
-
-  def test_passed(path)
-    say "Passed #{path}", :green
-    return true
-  end
-
-  def test_failed(path)
-    say "Failed #{path}", :red
-    return false
-  end
-
-  def output_path(path)
-    File.dirname(path) + '/' + File.basename(path, '.*') + '.out'
-  end
 
   def create_test_directories
     mkdir tests_root_path
