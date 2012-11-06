@@ -8,6 +8,7 @@ group :development do
   gem "jeweler", "~> 1.8.4"
   gem "bundler", "> 1.0.0"
   gem "minitest", "~> 4.2.0"
+  gem "mocha", require: false
   gem "simplecov"
 end
 
@@ -15,4 +16,5 @@ group :test do
   gem "rake", "~> 0.9.2.2"
   gem "bundler", "> 1.0.0"
   gem "minitest", "~> 4.2.0"
+  gem "mocha", require: false
 end

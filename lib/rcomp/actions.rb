@@ -34,8 +34,8 @@ class RComp
     # NOTE: may want to move this to config module
     # or refactor to not be config file specific
     def write_config_file
-      touch '.config'
-      config_file = File.open '.config'
+      touch conf_path
+      config_file = File.open conf_path
       config_file.puts YAML.dump data
     end
   end

@@ -25,47 +25,12 @@ class RComp
       conf_file.puts YAML.dump @conf
     end
 
-
-    # Conf option getters
-   
-    def conf_path
-      '.rcomp'
-    end
-
-    def tests_root_path
-      @conf["tests_directory"]
-    end
-
-    def set_tests_root_path(path)
-      @conf["tests_directory"] = path
-    end
-
-    def tests_path
-      tests_root_path + '/tests/'
-    end
-
-    def expected_path
-      tests_root_path + '/expected/'
-    end
-
-    def results_path
-      tests_root_path + '/results/'
-    end
-
-    def executable_path
-      @conf["executable"]
-    end
-
-    def set_executable_path(path)
-      @conf["executable"] = path
-    end
-
     def initialized?
-      tests_root_path && 
-        File.exists?(tests_root_path) && 
-        File.exists?(tests_path) && 
-        File.exists?(results_path) && 
-        File.exists?(expected_path)
+      root_path && 
+        File.exists?(root_path) && 
+        File.exists?(test_root_path) && 
+        File.exists?(result_root_path) && 
+        File.exists?(expected_root_path)
     end
 
     # Conf file error checking
@@ -74,9 +39,9 @@ class RComp
     def require_basic_conf
       require_executable_path
       require_executable_exists
-      require_tests_root_path
-      require_tests_root_exists
-      require_tests_subdirs
+      require_root_path
+      require_root_exists
+      require_root_subdirs
     end
     
     def require_executable_path
@@ -95,26 +60,26 @@ class RComp
       end
     end
 
-    def require_tests_root_path
-      unless tests_root_path
+    def require_root_path
+      unless root_path
         say "No test directory path present.", :red
         say "Run rcomp -d PATH to specify where rcomp should store tests.", :red
         exit 1
       end
     end
 
-    def require_tests_root_exists
-      unless File.exists? tests_root_path
-        say "Tests file doesn't exist at path #{tests_root_path}.", :red
-        say "Run rcomp init to create the directory at #{tests_root_path}.", :red
+    def require_root_exists
+      unless File.exists? root_path
+        say "Tests file doesn't exist at path #{root_path}.", :red
+        say "Run rcomp init to create the directory at #{root_path}.", :red
         exit 1
       end
     end
 
-    def require_tests_subdirs
-      unless File.exists?(tests_path) && File.exists?(results_path) && File.exists?(expected_path)
-        say "Test subdirectories not initilized inside #{tests_root_path}.", :red
-        say "Run rcomp init to create the required subdirectories in #{tests_root_path}.", :red
+    def require_root_subdirs
+      unless File.exists?(test_root_path) && File.exists?(result_root_path) && File.exists?(expected_root_path)
+        say "Test subdirectories not initilized inside #{root_path}.", :red
+        say "Run rcomp init to create the required subdirectories in #{root_path}.", :red
         exit 1
       end
     end

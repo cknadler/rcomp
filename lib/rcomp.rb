@@ -7,7 +7,7 @@ require 'find'
 #
 # RComp is a simple test framework for testing command line applications 
 # that require an input file. The tool was designed for testing programming
-# languages but has a wide array of uses.
+# languages.
 
 class RComp < Thor
   map "-e" => :set_executable
@@ -17,11 +17,13 @@ class RComp < Thor
   autoload :Conf, 'rcomp/conf'
   autoload :Test, 'rcomp/test'
   autoload :Helper, 'rcomp/helper'
+  autoload :Path, 'rcomp/path'
 
   include RComp::Actions
   include RComp::Conf
   include RComp::Test
   include RComp::Helper
+  include RComp::Path
 
   def initialize(args=[], options={}, config={})
     super
@@ -33,7 +35,7 @@ class RComp < Thor
   desc "init", "Setup rcomp test directory based on current configuration"
 
   def init
-    require_tests_root_path
+    require_root_path
 
     if initialized?
       say "RComp already initialized", :yellow
@@ -58,8 +60,7 @@ class RComp < Thor
 
     if executable_path
       unless @options[:overwrite]
-        say "executable key exists in config file", :red
-        say "Run rcomp -e -O PATH to overwrite", :red
+        say "Executable path exists. Run rcomp -e -O PATH to overwrite", :red
         exit 1
       end
     end
@@ -80,17 +81,16 @@ class RComp < Thor
 
   def set_tests_directory(path)
 
-    if tests_root_path
+    if root_path
       unless @options[:overwrite]
-        say "tests_directory key exists in config file", :red
-        say "Run rcomp -d -O PATH to overwrite", :red
+        say "Test directory path exists. Run rcomp -e -O PATH to overwrite", :red
         exit 1
       end
     end
 
-    set_tests_root_path path
+    set_root_path path
     write_conf
-    say "RComp successfully set tests directory path to #{tests_root_path}", :green
+    say "RComp successfully set tests directory path to #{root_path}", :green
   end
 
   # test
@@ -99,26 +99,16 @@ class RComp < Thor
 
   def test(path)
     require_basic_conf
-
-    # NOTE: Add logic for ignoring file extensions here
-    # It could go elsewhere, possibly in a module
-    
-    test = tests_path + path
-    run_tests test
+    run_tests find_test_path(path)
   end
 
   # test-all
 
   desc "test-all", "Run all tests"
-  method_option :verbose,
-    :type => :boolean,
-    :default => false,
-    :aliases => "-v",
-    :desc => "Toggle verbose output"
 
   def test_all
     require_basic_conf
-    run_tests tests_path
+    run_tests test_root_path
   end
 
   # gen
@@ -132,12 +122,7 @@ class RComp < Thor
 
   def gen(path)
     require_basic_conf
-    
-    # NOTE: Add logic for ignoring file extensions here
-    # It could go elsewhere, possibly in a module
-
-    test = tests_path + path
-    run_tests test, true, @options[:overwrite]
+    run_tests find_test_path(path), true, @options[:overwrite]
   end
 
   # gen-all
@@ -163,18 +148,19 @@ class RComp < Thor
       end
     end
 
-    run_tests tests_path, true, @options[:overwrite]
+    run_tests test_root_path, true, @options[:overwrite]
   end
 
   # vdiff
 
   desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
 
-  def vdiff(name)
+  def vdiff(path)
     require_basic_conf
 
-    result = output_path(results_path + name)
-    expected = output_path(expected_path + name)
+    rel_path = relative_path(find_test_path path)
+    result = output_path(result_root_path + rel_path)
+    expected = output_path(expected_root_path + rel_path)
 
     unless File.exists? result
       say "No result for test #{name}", :red
@@ -205,7 +191,7 @@ class RComp < Thor
     confirm = STDIN.gets.chomp
 
     if confirm.downcase == 'y'
-      rm_rf tests_root_path if tests_root_path
+      rm_rf test_root_path if test_root_path
       rm conf_path
       say 'RComp imploded!', :green
     else
@@ -217,9 +203,9 @@ class RComp < Thor
   private
 
   def create_test_directories
-    mkdir tests_root_path
-    mkdir tests_path
-    mkdir expected_path
-    mkdir results_path
+    mkdir root_path
+    mkdir test_root_path
+    mkdir expected_root_path
+    mkdir result_root_path
   end
 end

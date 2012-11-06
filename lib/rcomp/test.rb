@@ -14,21 +14,17 @@ class RComp
     # when generate is true. This will overwrite the existing expected
     # output for the specified test.
     
-    def run_tests(test_path, generate=false, overwrite=false)
-
-      # Make sure test exists
-      # If not, fail out unconditionally
-      print_test_missing test_path unless File.exists? test_path
+    def run_tests(path, generate=false, overwrite=false)
 
       success = failed = 0
 
       # Find all tests at tests path
-      Find.find(test_path) do |path|
-        if FileTest.directory?(path)
+      Find.find(path) do |p|
+        if FileTest.directory? p
           next
         else
           # Run generate or test depending on the generate flag
-          (generate ? exec_generate(path, overwrite) : exec_test(path)) ? 
+          (generate ? exec_generate(p, overwrite) : exec_test(p)) ? 
             success += 1 : failed += 1
         end
       end
@@ -44,14 +40,6 @@ class RComp
       exit 1 if failed > 0
     end
 
-    ##
-    # Returns the coresponding output path given the path to a test.
-    # output_path('notes/t1.mt') # => 'notes/t1.out'
-    
-    def output_path(path)
-      File.dirname(path) + '/' + File.basename(path, '.*') + '.out'
-    end
-
     private
 
     ##
@@ -62,9 +50,9 @@ class RComp
     def exec_test(test_path)
 
       # Get required paths
-      rel_path = test_path.gsub(tests_path, '')
-      expected = output_path(expected_path + rel_path)
-      result = output_path(results_path + rel_path)
+      rel_path = relative_path test_path
+      expected = output_path(expected_root_path + rel_path)
+      result = output_path(result_root_path + rel_path)
       
       # Make sure expected output exists
       return print_test_stubbed rel_path unless File.exists? expected
@@ -84,8 +72,8 @@ class RComp
     def exec_generate(test_path, overwrite)
 
       # Get required paths
-      rel_path = test_path.gsub(tests_path, '')
-      expected = output_path(expected_path + rel_path)
+      rel_path = relative_path test_path
+      expected = output_path(expected_root_path + rel_path)
 
       # Handle overwriting
       if File.exists? expected
@@ -97,6 +85,8 @@ class RComp
       system "#{executable_path} #{test_path} > #{expected}"
       print_generate_success rel_path
     end
+
+    # Test output
 
     def print_test_stubbed(path)
       say "Missing expected output for #{path}", :yellow
