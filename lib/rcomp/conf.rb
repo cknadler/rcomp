@@ -60,6 +60,14 @@ class RComp
       @conf["executable"] = path
     end
 
+    def initialized?
+      tests_root_path && 
+        File.exists?(tests_root_path) && 
+        File.exists?(tests_path) && 
+        File.exists?(results_path) && 
+        File.exists?(expected_path)
+    end
+
     # Conf file error checking
     
     # Emit error unless all required conf keys are present in conf file
@@ -114,7 +122,7 @@ class RComp
     private
 
     def conf_keys
-      ["tests_directory",
+      ["tests_directory", 
        "executable"]
     end
   end

@@ -34,9 +34,13 @@ class RComp < Thor
 
   def init
     require_tests_root_path
-    create_test_directories
 
-    ## FIX: add logic to check if all files already exist
+    if initialized?
+      say "RComp already initialized", :yellow
+      exit 1
+    end
+
+    create_test_directories
     
     say "RComp successfully initialized", :green
   end
