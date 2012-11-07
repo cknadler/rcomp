@@ -191,7 +191,7 @@ class RComp < Thor
     confirm = STDIN.gets.chomp
 
     if confirm.downcase == 'y'
-      rm_rf test_root_path if test_root_path
+      rm_rf test_root_path if root_path
       rm conf_path
       say 'RComp imploded!', :green
     else
