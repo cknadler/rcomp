@@ -38,13 +38,18 @@ class RComp < Thor
     require_root_path
 
     if initialized?
-      say "RComp already initialized", :yellow
+      say "RComp already initialized"
+      exit 1
+    end
+
+    unless Dir.exists?(File.dirname root_path)
+      say "No directory #{File.dirname root_path}"
       exit 1
     end
 
     create_test_directories
     
-    say "RComp successfully initialized", :green
+    say "RComp successfully initialized"
   end
 
   # -e
