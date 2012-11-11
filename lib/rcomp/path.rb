@@ -40,7 +40,7 @@ class RComp
     # Path getters
 
     def conf_path
-      @conf_path ||= '.rcomp'
+      @conf_path ||= File.absolute_path('.rcomp')
     end
 
     def root_path

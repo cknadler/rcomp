@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "rcomp"
   gem.homepage = "http://github.com/cknadler/rcomp"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{simple BDD for command line applications}
+  gem.description = %Q{simple BDD for command line applications}
   gem.email = "takeshi91k@gmail.com"
   gem.authors = ["Chris Knadler"]
   # dependencies defined in Gemfile
@@ -30,6 +30,9 @@ require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
 end
+
+require 'cucumber/rake/task'
+Cucumber::Rake::Task.new(:features)
 
 task :default => :spec
 

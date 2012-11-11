@@ -120,7 +120,7 @@ class RComp < Thor
     :aliases => "-O",
     :desc => "Overwrite expected output file for test if present"
 
-  def gen(path)
+  def generate(path)
     require_basic_conf
     run_tests find_test_path(path), true, @options[:overwrite]
   end
@@ -134,7 +134,7 @@ class RComp < Thor
     :aliases => "-O",
     :desc => "Overwrite expected output file for all tests if present"
 
-  def gen_all
+  def generate_all
     require_basic_conf
 
     if @options[:overwrite]
