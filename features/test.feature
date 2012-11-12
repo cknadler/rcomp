@@ -1,16 +1,9 @@
 Feature: Test
   Users should have the ability to run tests
   
+  @basic-config
   Scenario: Run single test
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
-    And a file named "rcomp/tests/test1.test" with:
+    Given a file named "rcomp/tests/test1.test" with:
       """
       ABC
 
@@ -47,16 +40,9 @@ Feature: Test
     Then the output should contain "1 test (1 passed)"
     And the exit status should be 0
 
+  @basic-config
   Scenario: Fail a single test
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
-    And a file named "rcomp/tests/test1.test" with:
+    Given a file named "rcomp/tests/test1.test" with:
       """
       ABC
       
@@ -70,16 +56,9 @@ Feature: Test
     Then the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
+  @basic-config
   Scenario: Run a test wihtout expected output
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
-    And a file named "rcomp/tests/test1.test" with:
+    Given a file named "rcomp/tests/test1.test" with:
       """
       ABC
       
@@ -88,17 +67,9 @@ Feature: Test
     Then the output should contain "1 test (1 missing)"
     And the exit status should be 0 
 
-
+  @basic-config
   Scenario: Run a test directory
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
-    And a file named "rcomp/tests/dir/test1.test" with:
+    Given a file named "rcomp/tests/dir/test1.test" with:
       """
       ABC
       
@@ -122,19 +93,12 @@ Feature: Test
     Then the output should contain "2 tests (2 passed)"
     And the exit status should be 0
 
+  @basic-config
   Scenario: Run a test directory with subdirs
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
-    And a file named "rcomp/tests/dir/test1.test" with:
+    Given a file named "rcomp/tests/dir/test1.test" with:
       """
       ABC
-      
+
       """
     And a file named "rcomp/tests/dir/subdir/test2.test" with:
       """
@@ -155,29 +119,15 @@ Feature: Test
     Then the output should contain "2 tests (2 passed)"
     And the exit status should be 0
 
+  @basic-config
   Scenario: Run test on an invalid path
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
     When I run `rcomp test bad/path/name`
     Then the output should contain "No test"
     And the exit status should be 1
 
+  @basic-config
   Scenario: Test a directory with passing, failing and stubbed tests
-    Given an executable named "test_exec" with:
-      """
-      #!/usr/bin/env ruby
-      puts IO.binread(ARGV[0])
-      """
-    And I run `rcomp -d rcomp`
-    And I run `rcomp -e test_exec`
-    And I run `rcomp init`
-    And a file named "rcomp/tests/dir/test1.test" with:
+    Given a file named "rcomp/tests/dir/test1.test" with:
       """
       ABC
       
