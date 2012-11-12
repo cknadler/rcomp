@@ -11,12 +11,14 @@ class RComp
       
       # Special case where full path is provided
       return absolute_path if File.exists? absolute_path
-      
-      # If the path cannot be found directly
-      # search for the path without extension
-      Find.find File.dirname(absolute_path) do |p|
-        if File.basename(p, '.*') == File.basename(path)
-          return p
+
+      if File.exists?(File.dirname(absolute_path))
+        # If the path cannot be found directly
+        # search for the path without extension
+        Find.find File.dirname(absolute_path) do |p|
+          if File.basename(p, '.*') == File.basename(path)
+            return p
+          end
         end
       end
 

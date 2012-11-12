@@ -16,25 +16,29 @@ class RComp
     
     def run_tests(path, generate=false, overwrite=false)
 
-      success = failed = 0
+      failed = missing = success = 0
 
       # Find all tests at tests path
       Find.find(path) do |p|
         if FileTest.directory? p
           next
         else
-          # Run generate or test depending on the generate flag
-          (generate ? exec_generate(p, overwrite) : exec_test(p)) ? 
-            success += 1 : failed += 1
+            result = generate ? exec_generate(p, overwrite) : exec_test(p)
+            case result
+            when :failed
+              failed += 1
+            when :stubbed
+              missing += 1
+            when :passed
+              success += 1
+            end
         end
       end
      
-      if (success + failed) > 1
-        if generate
-          print_generate_footer success, failed
-        else
-          print_test_footer success, failed
-        end
+      if generate
+        print_generate_footer success, failed
+      else
+        print_test_footer failed, missing, success
       end
 
       exit 1 if failed > 0
@@ -59,7 +63,7 @@ class RComp
 
       mkpath_to result unless File.exists? result
         
-      system "#{executable_path} #{test_path} > #{result}"
+      system "./#{executable_path} #{test_path} > #{result}"
 
       FileUtils.identical?(expected, result) ? 
         print_test_passed(rel_path) : print_test_failed(rel_path)
@@ -90,17 +94,17 @@ class RComp
 
     def print_test_stubbed(path)
       say "Missing expected output for #{path}", :yellow
-      return false
+      return :stubbed
     end
 
     def print_test_passed(path)
       say "Test #{path} passed", :green
-      return true
+      return :passed
     end
 
     def print_test_failed(path)
       say "Test #{path} failed", :red
-      return false
+      return :failed
     end
 
     def print_test_missing(path)
@@ -110,20 +114,24 @@ class RComp
     end
     
     def print_generate_success(path)
-      say "Generated expected output at #{path}", :green
+      say "Generated expected output for #{path}", :green
       return true
     end
 
     def print_generate_exists(path)
-      say "Expected output already exists at #{path}", :yellow
+      say "Expected output already exists for #{path}", :yellow
       return false
     end
 
 
-    def print_test_footer(passed, failed)
-      say "Ran #{passed + failed} tests"
-      say "Failed #{plural failed, 'test'}" unless failed == 0
-      say "Passed #{plural passed, 'test'}" unless passed == 0
+    def print_test_footer(failed, missing, passed)
+      desc = []
+      footer = "#{plural((failed + missing + passed), 'test')} ("
+      desc << "#{failed} failed" unless failed == 0
+      desc << "#{missing} missing" unless missing == 0
+      desc << "#{passed} passed" unless passed == 0
+      footer += desc.join(", ") + ")"
+      say footer
     end
 
     def print_generate_footer(success, failed)
