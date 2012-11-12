@@ -16,7 +16,7 @@ class RComp
     
     def run_tests(path, generate=false, overwrite=false)
 
-      failed = missing = success = 0
+      failed = skipped = passed = 0
 
       # Find all tests at tests path
       Find.find(path) do |p|
@@ -27,18 +27,18 @@ class RComp
             case result
             when :failed
               failed += 1
-            when :stubbed
-              missing += 1
+            when :skipped
+              skipped += 1
             when :passed
-              success += 1
+              passed += 1
             end
         end
       end
      
       if generate
-        print_generate_footer success, failed
+        print_generate_footer passed, failed
       else
-        print_test_footer failed, missing, success
+        print_test_footer failed, skipped, passed
       end
 
       exit 1 if failed > 0
@@ -94,16 +94,16 @@ class RComp
 
     def print_test_stubbed(path)
       say "Missing expected output for #{path}", :yellow
-      return :stubbed
+      return :skipped
     end
 
     def print_test_passed(path)
-      say "Test #{path} passed", :green
+      say "#{path} passed", :green
       return :passed
     end
 
     def print_test_failed(path)
-      say "Test #{path} failed", :red
+      say "#{path} failed", :red
       return :failed
     end
 
@@ -115,12 +115,12 @@ class RComp
     
     def print_generate_success(path)
       say "Generated expected output for #{path}", :green
-      return true
+      return :passed
     end
 
     def print_generate_exists(path)
       say "Expected output already exists for #{path}", :yellow
-      return false
+      return :skipped
     end
 
 
