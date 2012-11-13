@@ -13,7 +13,6 @@ Feature: Implode
   Scenario: Implode with basic config and dont confirm
     When I run `rcomp implode` interactively
     And I type "N"
-    Then a file named "rcomp" should exist
-    And the output should contain "Aborting"
+    Then the output should contain "Aborting"
+    And a directory named "rcomp" should exist
     And the exit status should be 1
-
