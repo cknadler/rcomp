@@ -56,7 +56,7 @@ class RComp < Thor
     say "RComp successfully initialized"
   end
 
-  # -e
+  # set-executable
 
   desc "set_executable PATH", "Set the path to the executable RComp will test"
   method_option :overwrite,
@@ -122,7 +122,7 @@ class RComp < Thor
 
   # gen
   
-  desc "gen PATH", "Generate expected output for test(s)"
+  desc "generate PATH", "Generate expected output for test(s)"
   method_option :overwrite,
     :type => :boolean,
     :default => false,
@@ -136,7 +136,7 @@ class RComp < Thor
 
   # gen-all
   
-  desc "gen-all", "Generate expected output for all tests without it"
+  desc "generate-all", "Generate expected output for all tests without it"
   method_option :overwrite,
     :type => :boolean,
     :default => false,
@@ -152,12 +152,12 @@ class RComp < Thor
       confirm = STDIN.gets.chomp
 
       unless confirm.downcase == 'y'
-        say "Aborting gen-all...", :red
+        say "Aborting...", :red
         exit 1
       end
     end
 
-    run_tests test_root_path, true, @options[:overwrite]
+    run_tests(test_root_path, true, @options[:overwrite])
   end
 
   # vdiff
@@ -172,12 +172,12 @@ class RComp < Thor
     expected = output_path(expected_root_path + rel_path)
 
     unless File.exists? result
-      say "No result for test #{name}", :red
+      say "No result for test #{rel_path}", :red
       exit 1
     end
 
     unless File.exist? expected
-      say "No expected output for test #{name}", :red
+      say "No expected output for test #{rel_path}", :red
       exit 1
     end
 

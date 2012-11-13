@@ -63,7 +63,7 @@ class RComp
 
       mkpath_to result unless File.exists? result
         
-      system "./#{executable_path} #{test_path} > #{result}"
+      system "#{executable_path} #{test_path} > #{result}"
 
       FileUtils.identical?(expected, result) ? 
         print_test_passed(rel_path) : print_test_failed(rel_path)
@@ -81,12 +81,12 @@ class RComp
 
       # Handle overwriting
       if File.exists? expected
-        return print_generate_exists rel_path unless overwrite
+        return print_generate_exists(rel_path) unless overwrite
       else
         mkpath_to expected 
       end
 
-      system "./#{executable_path} #{test_path} > #{expected}"
+      system "#{executable_path} #{test_path} > #{expected}"
       print_generate_success rel_path
     end
 
