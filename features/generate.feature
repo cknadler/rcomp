@@ -87,10 +87,33 @@ Feature: Generate
       """
     Given a file named "rcomp/expected/dir/test1.out" with:
       """
-      ABC
+      GHI
 
       """
     When I run `rcomp generate dir`
     Then the output should contain "2 files (1 skipped, 1 generated)"
     And the output should contain "Run rcomp generate -O PATH"
+    And the file "rcomp/expected/dir/test1.out" should contain "GHI"
+    And the exit status should be 0
+  
+  @basic-config
+  Scenario: Generate on directory with expected and overwrite
+    Given a file named "rcomp/tests/dir/test1.test" with:
+      """
+      ABC
+
+      """
+    Given a file named "rcomp/tests/dir/subdir/test2.test" with:
+      """
+      DEF
+
+      """
+    Given a file named "rcomp/expected/dir/test1.out" with:
+      """
+      GHI
+
+      """
+    When I run `rcomp generate -O dir`
+    Then the output should contain "2 files (2 generated)"
+    And the file "rcomp/expected/dir/test1.out" should contain "ABC"
     And the exit status should be 0
