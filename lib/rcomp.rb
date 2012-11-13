@@ -12,6 +12,10 @@ require 'find'
 class RComp < Thor
   map "-e" => :set_executable
   map "-d" => :set_tests_directory
+  map "g" => :generate
+  map "ga" => :generate_all
+  map "t" => :test
+  map "ta" => :test_all
 
   autoload :Actions, 'rcomp/actions'
   autoload :Conf, 'rcomp/conf'
