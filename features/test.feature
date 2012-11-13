@@ -16,6 +16,22 @@ Feature: Test
     When I run `rcomp test test1.test`
     Then the output should contain "1 test (1 passed)"
     And the exit status should be 0
+
+  @basic-config
+  Scenario: Ignore file extensions
+    Given a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    And a file named "rcomp/expected/test1.out" with:
+      """
+      ABC
+
+      """
+    When I run `rcomp test test1`
+    Then the output should contain "1 test (1 passed)"
+    And the exit status should be 0
   
   Scenario: Run a test with a subdir executable
     Given an executable named "src/test_exec" with:
@@ -64,7 +80,7 @@ Feature: Test
       
       """
     When I run `rcomp test test1.test`
-    Then the output should contain "1 test (1 missing)"
+    Then the output should contain "1 test (1 skipped)"
     And the exit status should be 0 
 
   @basic-config
@@ -153,5 +169,5 @@ Feature: Test
 
       """
     When I run `rcomp test dir`
-    Then the output should contain "3 tests (1 failed, 1 missing, 1 passed)"
+    Then the output should contain "3 tests (1 failed, 1 skipped, 1 passed)"
     And the exit status should be 1

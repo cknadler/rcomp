@@ -36,7 +36,7 @@ class RComp
       end
      
       if generate
-        print_generate_footer passed, failed
+        print_generate_footer skipped, passed
       else
         print_test_footer failed, skipped, passed
       end
@@ -86,7 +86,7 @@ class RComp
         mkpath_to expected 
       end
 
-      system "#{executable_path} #{test_path} > #{expected}"
+      system "./#{executable_path} #{test_path} > #{expected}"
       print_generate_success rel_path
     end
 
@@ -124,29 +124,26 @@ class RComp
     end
 
 
-    def print_test_footer(failed, missing, passed)
+    def print_test_footer(failed, skipped, passed)
       desc = []
-      footer = "#{plural((failed + missing + passed), 'test')} ("
+      footer = "#{plural((failed + skipped + passed), 'test')} ("
       desc << "#{failed} failed" unless failed == 0
-      desc << "#{missing} missing" unless missing == 0
+      desc << "#{skipped} skipped" unless skipped == 0
       desc << "#{passed} passed" unless passed == 0
       footer += desc.join(", ") + ")"
       say footer
     end
 
-    def print_generate_footer(success, failed)
-      say "Ran generate on #{success + failed} tests"
+    def print_generate_footer(skipped, generated)
+      desc = []
+      footer = "#{plural((skipped + generated), 'file')} ("
+      desc << "#{skipped} skipped" unless skipped == 0
+      desc << "#{generated} generated" unless generated == 0
+      footer += desc.join(", ") + ")"
+      say footer
 
-      unless failed == 0
-        say "Failed generating output for #{plural failed, 'test'}"
-      end
-
-      unless success == 0
-        say "Expected output was generated for #{plural success, 'test'}"
-      end
-
-      if failed > 0
-        say "Run rcomp gen -O PATH to overwrite existing expected output"
+      if skipped > 0
+        say "Run rcomp generate -O PATH to overwrite existing expected"
       end
     end
   end

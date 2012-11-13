@@ -13,6 +13,8 @@ require 'aruba/api'
 require 'aruba/cucumber'
 require 'test/unit/assertions'
 
+# Custom Tags
+
 Before('@basic-config') do
 
   # Create executable for testing
