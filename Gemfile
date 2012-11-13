@@ -7,7 +7,6 @@ group :development do
   gem "rake", "~> 10.0.0"
   gem "rdoc", "~> 3.12"
   gem "jeweler", "~> 1.8.4"
-  gem "rspec", "~> 2.11.0"
   gem "cucumber", "~> 1.2.1"
   gem "aruba", "~> 0.5.0"
   gem "simplecov", require: false
