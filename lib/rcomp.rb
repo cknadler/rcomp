@@ -66,17 +66,7 @@ class RComp < Thor
     desc: "Overwrite the current executable path"
 
   def set_executable(path)
-
-    if executable_path
-      unless @options[:overwrite]
-        say "Executable path exists. Run rcomp -e -O PATH to overwrite", :red
-        exit 1
-      end
-    end
-
-    set_executable_path path
-    write_conf
-    say "Rcomp successfully set executable path to #{executable_path}", :green
+    set_conf_value("executable", path, @options[:overwrite])
   end
 
   # -d
@@ -89,17 +79,7 @@ class RComp < Thor
     desc: "Overwrite the current test directory path"
 
   def set_tests_directory(path)
-
-    if root_path
-      unless @options[:overwrite]
-        say "Test directory path exists. Run rcomp -e -O PATH to overwrite", :red
-        exit 1
-      end
-    end
-
-    set_root_path path
-    write_conf
-    say "RComp successfully set tests directory path to #{root_path}", :green
+    set_conf_value("tests_directory", path, @options[:overwrite])
   end
 
   # test

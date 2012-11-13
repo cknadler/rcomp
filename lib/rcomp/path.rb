@@ -49,10 +49,6 @@ class RComp
       @conf["tests_directory"]
     end
 
-    def set_root_path(path)
-      @conf["tests_directory"] = path
-    end
-
     def test_root_path
       @test_root_path ||= root_path + '/tests/'
     end
@@ -67,10 +63,6 @@ class RComp
 
     def executable_path
       @conf["executable"]
-    end
-
-    def set_executable_path(path)
-      @conf["executable"] = path
     end
   end
 end

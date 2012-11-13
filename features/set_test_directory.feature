@@ -14,7 +14,7 @@ Feature: Set Test Directory Path
     And I run `rcomp -d spec/dir2`
     Then a file named ".rcomp" should exist
     And the file ".rcomp" should contain "tests_directory: spec/dir"
-    And the stdout should contain "path exists"
+    And the stdout should contain "already exists"
     And the exit status should be 1
 
   Scenario: Overwrite path that already exists

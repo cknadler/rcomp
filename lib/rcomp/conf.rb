@@ -19,6 +19,20 @@ class RComp
       end
     end
 
+    def set_conf_value(key, value, overwrite=false)
+      if @conf[key]
+        unless overwrite
+          say "Key #{key} already exists"
+          say "Run with -O to overwrite"
+          exit 1
+        end
+      end
+
+      @conf[key] = value
+      say "#{key} set to #{value}"
+      write_conf
+    end
+
     def write_conf
       touch conf_path unless File.exists?(conf_path)
       conf_file = File.open(conf_path, 'w')
