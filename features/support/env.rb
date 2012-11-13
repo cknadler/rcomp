@@ -27,7 +27,7 @@ Before('@basic-config') do
 
   # Spin up basic RComp configuration
   run_simple('rcomp -d rcomp', false)
-  run_simple('rcomp -e test_exec', false)
+  run_simple('rcomp -e ./test_exec', false)
   run_simple('rcomp init', false)
 end
 
