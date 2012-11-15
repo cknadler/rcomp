@@ -1,6 +1,7 @@
 source :rubygems
 
 gem "thor", "~> 0.16.0"
+gem "rainbow", "~> 1.1.4"
 
 group :development do
   gem "bundler", "> 1.0.0"
