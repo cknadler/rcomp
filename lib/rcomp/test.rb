@@ -59,7 +59,7 @@ class RComp
       result = output_path(result_root_path + rel_path)
       
       # Make sure expected output exists
-      return print_test_stubbed rel_path unless File.exists? expected
+      return print_test_skipped rel_path unless File.exists? expected
 
       mkpath_to result unless File.exists? result
         
@@ -81,7 +81,7 @@ class RComp
 
       # Handle overwriting
       if File.exists? expected
-        return print_generate_exists(rel_path) unless overwrite
+        return print_generate_skipped(rel_path) unless overwrite
       else
         mkpath_to expected 
       end
@@ -92,18 +92,18 @@ class RComp
 
     # Test output
 
-    def print_test_stubbed(path)
-      say "Missing expected output for #{path}", :yellow
+    def print_test_skipped(path)
+      say "\tskipped : #{path}", :yellow
       return :skipped
     end
 
     def print_test_passed(path)
-      say "#{path} passed", :green
+      say "\t passed : #{path}", :green
       return :passed
     end
 
     def print_test_failed(path)
-      say "#{path} failed", :red
+      say "\t failed : #{path}", :red
       return :failed
     end
 
@@ -114,12 +114,12 @@ class RComp
     end
     
     def print_generate_success(path)
-      say "Generated expected output for #{path}", :green
+      say "\tgenerated : #{path}", :green
       return :passed
     end
 
-    def print_generate_exists(path)
-      say "Expected output already exists for #{path}", :yellow
+    def print_generate_skipped(path)
+      say "\t  skipped : #{path}", :yellow
       return :skipped
     end
 

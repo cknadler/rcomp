@@ -69,7 +69,7 @@ class RComp < Thor
     set_conf_value("executable", path, @options[:overwrite])
   end
 
-  # -d
+  # set-tests-directory
   
   desc "set_tests_directory PATH", "Set the tests directory that RComp will run tests from"
   method_option :overwrite,
