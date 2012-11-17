@@ -14,9 +14,7 @@ require 'aruba/cucumber'
 require 'test/unit/assertions'
 
 # Custom Tags
-
 Before('@basic-config') do
-
   # Create executable for testing
   content = "#!/usr/bin/env ruby\nputs IO.binread(ARGV[0])"
 
@@ -26,8 +24,8 @@ Before('@basic-config') do
   end
 
   # Spin up basic RComp configuration
-  run_simple('rcomp -d rcomp', false)
-  run_simple('rcomp -e ./test_exec', false)
+  run_simple('rcomp d rcomp', false)
+  run_simple('rcomp c ./test_exec', false)
   run_simple('rcomp init', false)
 end
 

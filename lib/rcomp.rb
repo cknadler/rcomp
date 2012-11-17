@@ -1,7 +1,3 @@
-require 'thor'
-require 'yaml'
-require 'find'
-
 ###
 # = Overview
 #
@@ -9,99 +5,92 @@ require 'find'
 # that require an input file. The tool was designed for testing programming
 # languages.
 
+# external
+require 'thor'
+
 class RComp < Thor
-  map "-e" => :set_executable
-  map "-d" => :set_tests_directory
+
+  # internal
+  require 'rcomp/conf'
+  require 'rcomp/actions'
+
+  include RComp::Actions
+
+  map "c" => :set_command
+  map "d" => :set_directory
   map "g" => :generate
   map "ga" => :generate_all
   map "t" => :test
   map "ta" => :test_all
 
-  autoload :Actions, 'rcomp/actions'
-  autoload :Conf, 'rcomp/conf'
-  autoload :Test, 'rcomp/test'
-  autoload :Helper, 'rcomp/helper'
-  autoload :Path, 'rcomp/path'
-
-  include RComp::Actions
-  include RComp::Conf
-  include RComp::Test
-  include RComp::Helper
-  include RComp::Path
-
   def initialize(args=[], options={}, config={})
     super
-    load_conf
+    # load Conf singleton
+    @conf = Conf.instance
   end
 
-  # init
+  ##
+  ## CLI Commands
+  ##
   
+  # init
   desc "init", "Setup rcomp test directory based on current configuration"
 
   def init
-    require_root_path
-
     if initialized?
       say "RComp already initialized"
       exit 1
     end
 
-    unless Dir.exists?(File.dirname root_path)
-      say "No directory #{File.dirname root_path}"
+    unless Dir.exists?(File.dirname @conf.root)
+      say "No directory #{File.dirname @conf.root}"
       exit 1
     end
 
-    create_test_directories
-    
+    # Create RComp directories
+    mkdir @conf.root
+    mkdir @conf.test_root
+    mkdir @conf.expected_root
+    mkdir @conf.result_root
+
     say "RComp successfully initialized"
   end
 
-  # set-executable
+  # set-command
+  desc "set_command COMMAND", "Sets the command RComp will run tests with"
 
-  desc "set_executable PATH", "Set the path to the executable RComp will test"
-  method_option :overwrite,
-    type: :boolean,
-    default: false,
-    aliases: "-O",
-    desc: "Overwrite the current executable path"
-
-  def set_executable(path)
-    set_conf_value("executable", path, @options[:overwrite])
+  def set_command(command)
+    @conf.set_conf_value("command", command)
   end
 
-  # set-tests-directory
-  
-  desc "set_tests_directory PATH", "Set the tests directory that RComp will run tests from"
-  method_option :overwrite,
-    type: :boolean,
-    default: false,
-    aliases: "-O",
-    desc: "Overwrite the current test directory path"
+  # set-directory
+  desc "set_directory PATH", "Set the directory RComp will store files"
 
-  def set_tests_directory(path)
-    set_conf_value("tests_directory", path, @options[:overwrite])
+  def set_directory(path)
+    @conf.set_conf_value("directory", path)
   end
 
   # test
-
-  desc "test PATH", "Run specified test or test directory"
+  desc "test PATH", "Run specified test or test directory of tests"
 
   def test(path)
     require_basic_conf
-    run_tests find_test_path(path)
+    suite = Suite.new(path)
+    runner = Runner.new(suite)
+    runner.run(:test)
   end
 
   # test-all
-
   desc "test-all", "Run all tests"
 
   def test_all
     require_basic_conf
-    run_tests test_root_path
+    suite = Suite.new
+    runner = Runner.new(suite)
+    runner.run(:test)
   end
 
-  # gen
-  
+  # generate
   desc "generate PATH", "Generate expected output for test(s)"
   method_option :overwrite,
     :type => :boolean,
@@ -111,11 +100,12 @@ class RComp < Thor
 
   def generate(path)
     require_basic_conf
-    run_tests find_test_path(path), true, @options[:overwrite]
+    suite = Suite.new(path)
+    runner = Runner.new(suite)
+    runner.run(:generate, @options)
   end
 
-  # gen-all
-  
+  # generate-all
   desc "generate-all", "Generate expected output for all tests without it"
   method_option :overwrite,
     :type => :boolean,
@@ -127,74 +117,32 @@ class RComp < Thor
     require_basic_conf
 
     if @options[:overwrite]
-      say "This will overwrite all existing expected results."
-      print "Are you sure? (Y/N) "
-      confirm = STDIN.gets.chomp
-
-      unless confirm.downcase == 'y'
-        say "Aborting...", :red
-        exit 1
-      end
+      confirm_action "This will overwrite all existing expected results."
     end
 
-    run_tests(test_root_path, true, @options[:overwrite])
+    suite = Suite.new
+    runner = Runner.new(suite)
+    runner.run(:generate, @options)
   end
 
-  # vdiff
-
-  desc "vdiff TEST_NAME", "vimdiff a test's expected and actual result"
-
-  def vdiff(path)
-    require_basic_conf
-
-    rel_path = relative_path(find_test_path path)
-    result = output_path(result_root_path + rel_path)
-    expected = output_path(expected_root_path + rel_path)
-
-    unless File.exists? result
-      say "No result for test #{rel_path}", :red
-      exit 1
-    end
-
-    unless File.exist? expected
-      say "No expected output for test #{rel_path}", :red
-      exit 1
-    end
-
-    system "vimdiff #{expected} #{result}"
-  end
-
-  # implode
-
-  desc "implode", "Remove ALL RComp files including tests"
-
-  def implode
-
-    unless File.exists? conf_path
-      say 'Nothing to implode', :red
-      exit 1
-    end
-  
-    puts 'This will destroy all RComp files including all tests.'
-    print 'Are you sure? (Y/N) '
-    confirm = STDIN.gets.chomp
-
-    if confirm.downcase == 'y'
-      rm_rf test_root_path if root_path
-      rm conf_path
-      say 'RComp imploded!', :green
-    else
-      say 'Aborting implode...', :red
-      exit 1
-    end
-  end
 
   private
 
-  def create_test_directories
-    mkdir root_path
-    mkdir test_root_path
-    mkdir expected_root_path
-    mkdir result_root_path
+  def confirm_action(warning)
+    puts warning
+    print 'Are you sure? (Y/N) '
+    confirm = STDIN.gets.chomp
+
+    unless confirm.downcase == 'y'
+      say 'Aborting...'
+      exit 1
+    end
+  end
+
+  def initialized?
+    File.exists?(@conf.root) && 
+    File.exists?(@conf.test_root) && 
+    File.exists?(@conf.result_root) && 
+    File.exists?(@conf.expected_root)
   end
 end

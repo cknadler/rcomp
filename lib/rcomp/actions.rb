@@ -1,6 +1,8 @@
 class RComp
+  # stdlib
+  require 'fileutils'
+
   module Actions
-    
     def rm_rf(directory)
       if File.exist? directory
         FileUtils.rm_rf directory
@@ -29,14 +31,6 @@ class RComp
       unless File.exist? path
         FileUtils.touch path
       end
-    end
-
-    # NOTE: may want to move this to config module
-    # or refactor to not be config file specific
-    def write_config_file
-      touch conf_path
-      config_file = File.open conf_path
-      config_file.puts YAML.dump data
     end
   end
 end

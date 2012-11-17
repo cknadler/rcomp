@@ -1,108 +1,132 @@
 class RComp
-  module Conf
+  # stdlib
+  require 'singleton'
+  require 'yaml'
 
-    # Conf file IO
+  # internal
+  require 'rcomp/actions'
+
+  class Conf
+    include Singleton
+    include RComp::Actions
+
+    attr_reader :root, :test_root, :result_root, :expected_root, 
+                :command
+
+    # Initialize a new config object
+    #
+    # Loads options from config file, merges with defaults
+    # and stores everything in memory
+    def initialize
+      # Config file path
+      @path = '.rcomp'
     
-    def load_conf
+      # Set valid keys for config file
+      @valid_keys = ['directory',
+                     'command']
 
-      @conf = {}
-      
-      if File.exists?(conf_path) && File.size?(conf_path)
-        # Store valid conf keys
-        YAML.load_file(conf_path).each do |conf_key, conf_value|
-          if conf_keys.include? conf_key
-            @conf[conf_key] = conf_value
-          else
-            say "Invalid configuration key: #{conf_key}", :yellow
-          end
-        end
-      end
+      # Set default options and overwrite with config file options
+      @default = { 'directory' => 'rcomp' }
+      @custom = read_conf_file
+      @conf = @default.merge(@custom)
+
+      # Load configuration values into attributes
+      @command = @conf['command']
+      @root = @conf['directory']
+      @test_root = @root + '/tests/'
+      @result_root = @root + '/results/'
+      @expected_root = @root + '/expected/'
     end
 
-    def set_conf_value(key, value, overwrite=false)
-      if @conf[key]
-        unless overwrite
-          say "Key #{key} already exists"
-          say "Run with -O to overwrite"
-          exit 1
-        end
-      end
-
-      @conf[key] = value
-      say "#{key} set to #{value}"
-      write_conf
+    # Set a configuration value and write it to the config file
+    #
+    # Returns nothing
+    def set_conf_value(key, value)
+      @custom[key] = value
+      puts "#{key} set to #{value}"
+      write_conf_file
     end
-
-    def write_conf
-      touch conf_path unless File.exists?(conf_path)
-      conf_file = File.open(conf_path, 'w')
-      conf_file.puts YAML.dump @conf
-    end
-
-    def initialized?
-      root_path && 
-        File.exists?(root_path) && 
-        File.exists?(test_root_path) && 
-        File.exists?(result_root_path) && 
-        File.exists?(expected_root_path)
-    end
-
-    # Conf file error checking
     
     # Emit error unless all required conf keys are present in conf file
+    #
+    # Returns nothing
     def require_basic_conf
-      require_executable_path
-      require_executable_exists
-      require_root_path
+      require_command
       require_root_exists
       require_root_subdirs
     end
-    
-    def require_executable_path
-      unless executable_path
-        say "No executable path present. RComp needs the path to an executable to test.", :red
-        say "Run rcomp -e PATH to add your executable path.", :red
-        exit 1
-      end
-    end
 
-    def require_executable_exists
-      unless File.exists? executable_path
-        say "Executable doesn't exist at path #{executable_path}.", :red
-        say "Run rcomp -e PATH to change your executable path.", :red
-        exit 1
-      end
-    end
-
-    def require_root_path
-      unless root_path
-        say "No test directory path present.", :red
-        say "Run rcomp -d PATH to specify where rcomp should store tests.", :red
-        exit 1
-      end
-    end
-
-    def require_root_exists
-      unless File.exists? root_path
-        say "Tests file doesn't exist at path #{root_path}.", :red
-        say "Run rcomp init to create the directory at #{root_path}.", :red
-        exit 1
-      end
-    end
-
-    def require_root_subdirs
-      unless File.exists?(test_root_path) && File.exists?(result_root_path) && File.exists?(expected_root_path)
-        say "Test subdirectories not initilized inside #{root_path}.", :red
-        say "Run rcomp init to create the required subdirectories in #{root_path}.", :red
-        exit 1
-      end
-    end
 
     private
 
-    def conf_keys
-      ["tests_directory", 
-       "executable"]
+    # Write the current config options to the config file
+    #
+    # Returns nothing
+    def write_conf_file
+      exit 1 unless @path
+      touch @path unless File.exists?(@path)
+      conf_file = File.open(@path, 'w')
+      conf_file.puts YAML.dump @custom
+    end
+    
+    # Read the config options from RComp's configuration file
+    #
+    # Returns a Hash of config options
+    def read_conf_file
+      conf = {}
+
+      if File.exists?(@path) && File.size?(@path)
+
+        # Store valid conf keys
+        YAML.load_file(@path).each do |key, value|
+
+          if @valid_keys.include? key
+            conf[key] = value
+          else
+            say "Invalid configuration key: #{key}"
+          end
+        end
+      end
+
+      conf
+    end
+
+    # Require the command config option to be set
+    # Print error and exit otherwise
+    #
+    # Returns nothing
+    def require_command
+      unless @command
+        say "No command present"
+        say "Run rcomp -e PATH to add a command to test with"
+        exit 1
+      end
+    end
+
+    # Require the existance of the root directory
+    # Print error and exit otherwise
+    #
+    # Returns nothing
+    def require_root_exists
+      unless File.exists? root_path
+        say "No RComp directories at #{@root}"
+        say "Run rcomp init to create them"
+        exit 1
+      end
+    end
+
+    # Require all sudirectories of the root directory to exist
+    # Print error and exit otherwise
+    #
+    # Returns nothing
+    def require_root_subdirs
+      unless File.exists?(@test_root) && 
+        File.exists?(@result_root) && 
+        File.exists?(@expected_root)
+        say "Missing RComp directories at #{@root}"
+        say "Run rcomp init to repair"
+        exit 1
+      end
     end
   end
 end
