@@ -1,41 +1,44 @@
 Feature: Init
-  In order to store tests
-  RComp requires a directory structure
-  if all configuration is complete
-  RComp should create this when init is run
+  A user should be able to initialize the RComp's test directories
 
-  Scenario: Valid init
-    Given a directory named "spec"
-    And I run `rcomp -d spec/rcomp`
+  Scenario: Blind init
     When I run `rcomp init`
     Then the following directories should exist:
-      | spec/rcomp |
-      | spec/rcomp/tests |
-      | spec/rcomp/results |
-      | spec/rcomp/expected |
-    And the stdout should contain "successfully initialized"
+      | rcomp |
+      | rcomp/tests |
+      | rcomp/results |
+      | rcomp/expected |
     And the exit status should be 0
 
-  Scenario: Init without directory set
+  Scenario: Init with directory set in project root
+    Given I run `rcomp d dir`
     When I run `rcomp init`
-    Then the stdout should contain "No test directory"
-    And the exit status should be 1
+    Then the following directories should exist:
+      | dir |
+      | dir/tests |
+      | dir/results |
+      | dir/expected |
+    And the exit status should be 0
 
-  Scenario: Init with invalid directory
-    Given a file named ".rcomp" with:
-      """
-      ---
-      tests_directory: spec/rcomp
-      """
+  Scenario: Init with directory set in subdirectory
+    Given a directory named "spec/dir"
+    And I run `rcomp d spec/dir/rcomp`
     When I run `rcomp init`
-    Then the stdout should contain "No directory"
+    Then the following directories should exist:
+      | spec/dir/rcomp |
+      | spec/dir/rcomp/tests |
+      | spec/dir/rcomp/results |
+      | spec/dir/rcomp/expected |
+    And the exit status should be 0
+
+  Scenario: Init with directory set in nonexistant subdirectory
+    Given I run `rcomp d nonexistant/rcomp`
+    When I run `rcomp init`
+    Then the stdout should contain "No directory nonexistant"
     And the exit status should be 1
 
   Scenario: Already initialized
-    Given a directory named "spec"
-    And I run `rcomp -d spec`
-    And I run `rcomp init`
+    Given I run `rcomp init`
     When I run `rcomp init`
     Then the stdout should contain "already initialized"
     And the exit status should be 1
-
