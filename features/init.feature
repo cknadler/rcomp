@@ -34,11 +34,11 @@ Feature: Init
   Scenario: Init with directory set in nonexistant subdirectory
     Given I run `rcomp d nonexistant/rcomp`
     When I run `rcomp init`
-    Then the stdout should contain "No directory nonexistant"
+    Then the output should contain "No directory nonexistant"
     And the exit status should be 1
 
   Scenario: Already initialized
     Given I run `rcomp init`
     When I run `rcomp init`
-    Then the stdout should contain "already initialized"
+    Then the output should contain "already initialized"
     And the exit status should be 1

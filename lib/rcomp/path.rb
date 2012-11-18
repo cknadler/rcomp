@@ -1,13 +1,31 @@
-module Path
-  def relative_path(test_path)
-    test_path.gsub(@conf.test_root, '')
-  end
+# internal
+require 'rcomp/conf'
 
-  def result_path(test_path)
-    @conf.result_root + relative_path(test_path)
-  end
+class RComp
+  module Path
+    def rel_path(test_path)
+      test_path.gsub(Conf.instance.test_root, '')
+    end
 
-  def expected_path(test_path)
-    @conf.expected_root + relative_path(test_path)
+    def result_path(test_path, type)
+      cmpnts = []
+      cmpnts << Conf.instance.result_root
+      cmpnts << rel_path(File.dirname(test_path))
+      cmpnts << File.basename(test_path, ".*") + (type == :out ? '.out' : '.err')
+      File.join(cmpnts)
+    end
+
+    def expected_path(test_path, type)
+      puts Conf.instance.expected_root
+      puts rel_path(File.dirname(test_path))
+      puts File.basename(test_path, ".*") + (type == :out ? '.out' : '.err')
+
+      cmpnts = []
+      cmpnts << Conf.instance.expected_root
+      cmpnts << rel_path(File.dirname(test_path))
+      cmpnts << File.basename(test_path, ".*") + (type == :out ? '.out' : '.err')
+      puts File.join(cmpnts)
+      File.join(cmpnts)
+    end
   end
 end

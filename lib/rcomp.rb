@@ -13,15 +13,20 @@ class RComp < Thor
   # internal
   require 'rcomp/conf'
   require 'rcomp/actions'
+  require 'rcomp/suite'
+  require 'rcomp/runner'
+  require 'rcomp/path'
 
   include RComp::Actions
+  include RComp::Suite
+  include RComp::Runner
+  include RComp::Path
 
+  map "new" => :init
   map "c" => :set_command
   map "d" => :set_directory
   map "g" => :generate
-  map "ga" => :generate_all
   map "t" => :test
-  map "ta" => :test_all
 
   def initialize(args=[], options={}, config={})
     super
@@ -38,12 +43,12 @@ class RComp < Thor
 
   def init
     if initialized?
-      say "RComp already initialized"
+      puts "RComp already initialized"
       exit 1
     end
 
-    unless Dir.exists?(File.dirname @conf.root)
-      say "No directory #{File.dirname @conf.root}"
+    unless Dir.exists?(File.dirname(@conf.root))
+      puts "No directory #{File.dirname(@conf.root)}"
       exit 1
     end
 
@@ -53,7 +58,7 @@ class RComp < Thor
     mkdir @conf.expected_root
     mkdir @conf.result_root
 
-    say "RComp successfully initialized"
+    puts "RComp successfully initialized"
   end
 
   # set-command
@@ -71,60 +76,45 @@ class RComp < Thor
   end
 
   # test
-  desc "test PATH", "Run specified test or test directory of tests"
+  desc "test", "Run all tests"
+  method_option :grep,
+    :type => :string,
+    :desc => "Only test files that match pattern"
 
-  def test(path)
-    require_basic_conf
-    suite = Suite.new(path)
-    runner = Runner.new(suite)
-    runner.run(:test)
-  end
-
-  # test-all
-  desc "test-all", "Run all tests"
-
-  def test_all
-    require_basic_conf
-    suite = Suite.new
-    runner = Runner.new(suite)
-    runner.run(:test)
+  def test
+    @conf.require_basic_conf
+    if @options[:grep]
+      run_suite(load_suite(@options[:grep]), :test)
+    else
+      run_suite(load_suite, :test)
+    end
   end
 
   # generate
-  desc "generate PATH", "Generate expected output for test(s)"
-  method_option :overwrite,
+  desc "generate", "Generate expected output for all tests"
+  method_option :grep,
+    :type => :string,
+    :desc => "Only test files that match pattern"
+  method_option :overwrite, 
     :type => :boolean,
     :default => false,
     :aliases => "-O",
     :desc => "Overwrite expected output file for test if present"
 
-  def generate(path)
-    require_basic_conf
-    suite = Suite.new(path)
-    runner = Runner.new(suite)
-    runner.run(:generate, @options)
-  end
+  def generate
+    @conf.require_basic_conf
 
-  # generate-all
-  desc "generate-all", "Generate expected output for all tests without it"
-  method_option :overwrite,
-    :type => :boolean,
-    :default => false,
-    :aliases => "-O",
-    :desc => "Overwrite expected output file for all tests if present"
-
-  def generate_all
-    require_basic_conf
-
-    if @options[:overwrite]
+    # Display confirmation dialouge when -O is passed without filter
+    if !@options[:grep] && options.overwrite
       confirm_action "This will overwrite all existing expected results."
     end
 
-    suite = Suite.new
-    runner = Runner.new(suite)
-    runner.run(:generate, @options)
+    if @options[:grep]
+      run_suite(load_suite(@options[:grep]), :generate, @options)
+    else
+      run_suite(load_suite, :generate, @options)
+    end
   end
-
 
   private
 

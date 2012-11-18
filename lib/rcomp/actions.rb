@@ -1,6 +1,7 @@
+# stdlib
+require 'fileutils'
+
 class RComp
-  # stdlib
-  require 'fileutils'
 
   module Actions
     def rm_rf(directory)

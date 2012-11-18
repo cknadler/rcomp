@@ -1,12 +1,13 @@
+# stdlib
+require 'singleton'
+require 'yaml'
+
+# internal
+require 'rcomp/actions'
+
 class RComp
-  # stdlib
-  require 'singleton'
-  require 'yaml'
-
-  # internal
-  require 'rcomp/actions'
-
   class Conf
+
     include Singleton
     include RComp::Actions
 
@@ -33,9 +34,9 @@ class RComp
       # Load configuration values into attributes
       @command = @conf['command']
       @root = @conf['directory']
-      @test_root = @root + '/tests/'
-      @result_root = @root + '/results/'
-      @expected_root = @root + '/expected/'
+      @test_root = @root + '/tests'
+      @result_root = @root + '/results'
+      @expected_root = @root + '/expected'
     end
 
     # Set a configuration value and write it to the config file
@@ -97,8 +98,8 @@ class RComp
     # Returns nothing
     def require_command
       unless @command
-        say "No command present"
-        say "Run rcomp -e PATH to add a command to test with"
+        puts "No command present"
+        puts "Run rcomp -e PATH to add a command to test with"
         exit 1
       end
     end
@@ -108,9 +109,8 @@ class RComp
     #
     # Returns nothing
     def require_root_exists
-      unless File.exists? root_path
-        say "No RComp directories at #{@root}"
-        say "Run rcomp init to create them"
+      unless File.exists? @root
+        puts "No RComp directory. Run rcomp init to create"
         exit 1
       end
     end
@@ -123,8 +123,8 @@ class RComp
       unless File.exists?(@test_root) && 
         File.exists?(@result_root) && 
         File.exists?(@expected_root)
-        say "Missing RComp directories at #{@root}"
-        say "Run rcomp init to repair"
+        puts "Missing RComp directories at #{@root}"
+        puts "Run rcomp init to repair"
         exit 1
       end
     end

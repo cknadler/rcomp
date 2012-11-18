@@ -1,4 +1,8 @@
+# external
 require 'aruba/api'
+
+# stdlib
+require 'fileutils'
 
 Given /^an executable named "([^"]*)" with:$/ do |file_name, file_content|
   write_file(file_name, file_content)
@@ -7,6 +11,6 @@ Given /^an executable named "([^"]*)" with:$/ do |file_name, file_content|
   end
 end
 
-Then /^the file "(.*?)" matches "(.*?)" exactly$/ do |file1, file2|
+Then /^the files "(.*?)" and "(.*?)" should be identical$/ do |file1, file2|
   FileUtils.identical?(file1, file2).should eq true
 end
