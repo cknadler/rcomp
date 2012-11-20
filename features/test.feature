@@ -167,3 +167,32 @@ Feature: Test
     When I run `rcomp test`
     Then the output should contain "1 test (1 passed)"
     And the exit status should be 0
+
+  # system files
+  @basic-conf
+  Scenario: Test with system files
+    Given a file named "rcomp/tests/.DS_Store" with:
+      """
+      some data
+
+      """
+    When I run `rcomp test`
+    Then the output should contain "0 tests ()"
+    And the exit status should be 0
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with multiple tests and system files
+    Given a file named "rcomp/tests/.DS_Store" with:
+      """
+      some data
+
+      """
+    And a file named "rcomp/tests/dir/.DS_Store" with:
+      """
+      some more data
+
+      """
+    When I run `rcomp test`
+    Then the output should contain "3 tests (1 failed, 1 skipped, 1 passed)"
+    And the exit status should be 1

@@ -222,3 +222,32 @@ Feature: Generate
     When I run `rcomp generate`
     Then the output should contain "1 file (1 generated)"
     And the exit status should be 0
+
+  # system files
+  @basic-conf
+  Scenario: Generate with system files
+    Given a file named "rcomp/tests/.DS_Store" with:
+      """
+      some data
+
+      """
+    When I run `rcomp generate`
+    Then the output should contain "0 files ()"
+    And the exit status should be 0
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Generate with multiple tests and system files
+    Given a file named "rcomp/tests/.DS_Store" with:
+      """
+      some data
+
+      """
+    And a file named "rcomp/tests/dir/.DS_Store" with:
+      """
+      some more data
+
+      """
+    When I run `rcomp generate`
+    Then the output should contain "3 files (2 skipped, 1 generated)"
+    And the exit status should be 0

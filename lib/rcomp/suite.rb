@@ -23,6 +23,9 @@ module RComp
           next unless rel_path(path).match(pattern)
         end
 
+        # ignore dotfiles
+        next if File.basename(path).match(/^\..*/)
+
         tests << Test.new(path)
       end
 
