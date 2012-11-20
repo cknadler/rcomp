@@ -13,15 +13,10 @@ module RComp
     end
 
     def expected_path(test_path, type)
-      puts Conf.instance.expected_root
-      puts rel_path(File.dirname(test_path))
-      puts File.basename(test_path, ".*") + (type == :out ? '.out' : '.err')
-
       cmpnts = []
       cmpnts << Conf.instance.expected_root
       cmpnts << rel_path(File.dirname(test_path))
       cmpnts << File.basename(test_path, ".*") + (type == :out ? '.out' : '.err')
-      puts File.join(cmpnts)
       File.join(cmpnts)
     end
   end
