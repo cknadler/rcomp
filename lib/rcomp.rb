@@ -23,7 +23,6 @@ class RComp < Thor
   include RComp::Runner
   include RComp::Path
 
-  map "new" => :init
   map "c" => :set_command
   map "d" => :set_directory
   map "g" => :generate
