@@ -1,11 +1,7 @@
-# internal
-require 'rcomp/test'
-require 'rcomp/helper'
-
-class RComp
+module RComp
   class Reporter
 
-    include RComp::Helper 
+    include RComp::Helper
 
     # Initialize a new Reporter
     #

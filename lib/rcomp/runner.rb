@@ -1,13 +1,6 @@
-# stdlib
 require 'fileutils'
 
-# internal
-require 'rcomp/conf'
-require 'rcomp/test'
-require 'rcomp/reporter'
-require 'rcomp/actions'
-
-class RComp
+module RComp
   module Runner
 
     include RComp::Actions

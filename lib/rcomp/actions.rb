@@ -1,8 +1,6 @@
-# stdlib
 require 'fileutils'
 
-class RComp
-
+module RComp
   module Actions
     def rm_rf(directory)
       if File.exist? directory

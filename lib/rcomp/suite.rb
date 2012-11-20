@@ -1,12 +1,9 @@
-# stdlib
 require 'find'
 
-# internal
-require 'rcomp/conf'
-require 'rcomp/test'
-
-class RComp
+module RComp
   module Suite
+
+    include RComp::Path
 
     # Create a test suite
     #

@@ -1,11 +1,7 @@
-# stdlib
 require 'singleton'
 require 'yaml'
 
-# internal
-require 'rcomp/actions'
-
-class RComp
+module RComp
   class Conf
 
     include Singleton

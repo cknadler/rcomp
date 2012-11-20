@@ -1,7 +1,4 @@
-# internal
-require 'rcomp/path'
-
-class RComp
+module RComp
   class Test
 
     include RComp::Path

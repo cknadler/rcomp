@@ -1,4 +1,4 @@
-class RComp
+module RComp
   module Helper
 
     ##
