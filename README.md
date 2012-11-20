@@ -1,7 +1,7 @@
 # RComp [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/cknadler/rcomp) [![Dependency Status](https://gemnasium.com/cknadler/rcomp.png)](https://gemnasium.com/cknadler/rcomp) [![Build Status](https://travis-ci.org/cknadler/rcomp.png)](https://travis-ci.org/cknadler/rcomp)
 
 
-RComp is a simple test framework for testing command line applications output. It works by passing a specified command tests (files) by argument and comparing the result with expected output.
+RComp is a simple framework for testing command line application output. It works by passing a specified command tests (files) by argument and comparing the result with expected output.
 
 ## Installation
 
