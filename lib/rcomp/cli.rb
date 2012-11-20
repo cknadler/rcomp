@@ -7,12 +7,6 @@ module RComp
     include RComp::Runner
     include RComp::Suite
 
-    # aliases
-    map "c" => :set_command
-    map "d" => :set_directory
-    map "g" => :generate
-    map "t" => :test
-
     def initialize(args=[], options={}, config={})
       super
       # load Conf singleton
@@ -50,18 +44,21 @@ module RComp
     def version
       puts "RComp version #{RComp::VERSION}"
     end
+    map %w(-v --version) => :version
 
     # set-command
     desc "set_command COMMAND", "Sets the command RComp will run tests with"
     def set_command(command)
       @conf.set_conf_value("command", command)
     end
+    map "c" => :set_command
 
     # set-directory
     desc "set_directory PATH", "Set the directory RComp will store files"
     def set_directory(path)
       @conf.set_conf_value("directory", path)
     end
+    map "d" => :set_directory
 
     # test
     desc "test", "Run all tests"
@@ -76,6 +73,7 @@ module RComp
         run_suite(load_suite, :test)
       end
     end
+    map "t" => :test
 
     # generate
     desc "generate", "Generate expected output for all tests"
@@ -101,6 +99,7 @@ module RComp
         run_suite(load_suite, :generate, @options)
       end
     end
+    map "g" => :generate
 
     private
 

@@ -20,6 +20,7 @@ Tasks:
   rcomp set_command COMMAND  # Sets the command RComp will run tests with
   rcomp set_directory PATH   # Set the directory RComp will store files
   rcomp test                 # Run all tests
+  rcomp version              # Prints RComp's version information
 ```
 
 ## Setup
@@ -111,6 +112,10 @@ All custom configuration is stored in a `.rcomp` file as YAML
   <tr>
     <td><code>set-directory</code></td>
     <td><code>d</code></td>
+  </tr>
+  <tr>
+    <td><code>version</code></td>
+    <td><code>-v</code><code>--version</code></td>
   </tr>
 </table>
 
