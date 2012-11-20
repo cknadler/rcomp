@@ -1,0 +1,8 @@
+== 0.1.1, released 2012-11-20
+
+* Ignore dotfiles in tests directory
+* Clean up generate output, remove remnant debugging output
+
+== 0.1.0, released 2012-11-20
+
+* Initial release
