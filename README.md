@@ -10,6 +10,7 @@ $ gem install rcomp
 ```
 
 ## Usage
+
 ```
 $ rcomp
 Tasks:
@@ -33,6 +34,7 @@ $ rcomp init
 Then create some tests in `rcomp/tests`
 
 ## Structure
+
 After running `rcomp init` the following directories are created by default:
 
 ```
@@ -71,21 +73,46 @@ A simple RComp suite might look something like this:
 ```
 
 ## Configuration
+
 All custom configuration is stored in a `.rcomp` file as YAML
 
-| Setting | Config | Default | Description |
-|-|-|-|
-| command | `command: [COMMAND]` | | Command RComp will run tests with  |
-| directory | `directory: [DIRECTORY]` | `rcomp` | Directory RComp will store tests, results and expected |
+<table>
+  <th>Setting</th><th>Config</th><th>Default</th><th>Description</th>
+  <tr>
+    <td>command</td>
+    <td><code>command: [COMMAND]</code></td>
+    <td></td>
+    <td>Command RComp will run tests with</td>
+  </tr>
+  <tr>
+    <td>directory</td>
+    <td><code>directory: [DIRECTORY]</code></td>
+    <td><code>rcomp</code></td>
+    <td>Directory RComp will store tests, results and expected in</td>
+  </tr>
+</table>
 
 ## Aliases
-| Task | Alias |
-|-|-|
-| `test` | `t` |
-| `generate` | `g` |
-| `set-command` | `c` |
-| `set-directory` | `d` |
 
+<table>
+  <th>Task</th><th>Alias</th>
+  <tr>
+    <td><code>test</code></td>
+    <td><code>t</code></td>
+  </tr>
+  <tr>
+    <td><code>generate</code></td>
+    <td><code>g</code></td>
+  </tr>
+  <tr>
+    <td><code>set-command</code></td>
+    <td><code>c</code></td>
+  </tr>
+  <tr>
+    <td><code>set-directory</code></td>
+    <td><code>d</code></td>
+  </tr>
+</table>
 
 ## Copyright
 
