@@ -5,11 +5,14 @@ require "rcomp/version"
 Gem::Specification.new do |s|
   s.name        = "rcomp"
   s.version     = RComp::VERSION
+  s.license     = "MIT"
   s.authors     = ["Chris Knadler"]
   s.email       = ["takeshi91k@gmail.com"]
   s.homepage    = "https://github.com/cknadler/rcomp"
   s.summary     = "A simple framework for testing command line application output."
   s.description = "A simple framework for testing command line application output."
+
+  s.required_ruby_version     = ">= 1.9.2"
 
   s.rubyforge_project = "rcomp"
 
@@ -20,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency("thor", "~> 0.16.0")
   
+  s.add_development_dependency("rake")
   s.add_development_dependency("cucumber", "~> 1.2.1")
   s.add_development_dependency("aruba", "~> 0.5.0")
-  s.add_development_dependency("rake", "~> 10.0.0")
 end

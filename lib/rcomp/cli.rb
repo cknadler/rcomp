@@ -25,7 +25,6 @@ module RComp
     
     # init
     desc "init", "Setup rcomp test directory"
-
     def init
       if initialized?
         puts "RComp already initialized"
@@ -46,16 +45,20 @@ module RComp
       puts "RComp successfully initialized"
     end
 
+    # version
+    desc "version", "Prints RComp's version information"
+    def version
+      puts "RComp version #{RComp::VERSION}"
+    end
+
     # set-command
     desc "set_command COMMAND", "Sets the command RComp will run tests with"
-
     def set_command(command)
       @conf.set_conf_value("command", command)
     end
 
     # set-directory
     desc "set_directory PATH", "Set the directory RComp will store files"
-
     def set_directory(path)
       @conf.set_conf_value("directory", path)
     end
@@ -65,7 +68,6 @@ module RComp
     method_option :grep,
       :type => :string,
       :desc => "Only test files that match pattern"
-
     def test
       @conf.require_basic_conf
       if @options[:grep]
@@ -85,7 +87,6 @@ module RComp
       :default => false,
       :aliases => "-O",
       :desc => "Overwrite expected output file for test if present"
-
     def generate
       @conf.require_basic_conf
 
