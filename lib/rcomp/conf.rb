@@ -99,7 +99,7 @@ class RComp
     def require_command
       unless @command
         puts "No command present"
-        puts "Run rcomp -e PATH to add a command to test with"
+        puts "Run rcomp c COMMAND to add a command to test with"
         exit 1
       end
     end
