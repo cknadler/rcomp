@@ -2,7 +2,8 @@
 # = Overview
 #
 # RComp is a simple test framework for testing command line applications 
-# that require an input file. The tool was designed for testing programming
+# output. It works by passing a specified command "tests", in the form 
+# of files, as arguments. It was designed for testing programming
 # languages.
 
 # external
@@ -39,7 +40,7 @@ class RComp < Thor
   ##
   
   # init
-  desc "init", "Setup rcomp test directory based on current configuration"
+  desc "init", "Setup rcomp test directory"
 
   def init
     if initialized?
