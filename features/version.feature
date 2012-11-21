@@ -3,4 +3,4 @@ Feature: Version
 
   Scenario: run version
     When I run `rcomp version`
-    Then the output should contain "0.1.0"
+    Then the output should contain the version number
