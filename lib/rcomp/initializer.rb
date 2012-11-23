@@ -24,7 +24,10 @@ module RComp
       end
     end
 
-    def init_directories
+    # Create RComp directories if they don't already exist
+    # 
+    # Returns nothing
+    def initialize_directories
       mkpath @@conf.root
       mkdir @@conf.test_root
       mkdir @@conf.expected_root

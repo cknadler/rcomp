@@ -26,7 +26,7 @@ module RComp
         @conf.set_command(ask("Enter the command you want to test:"))
       end
 
-      init_directories # automatically checks for existance
+      initialize_directories
       puts "RComp successfully initialized"
     end
 
@@ -69,11 +69,10 @@ module RComp
 
       # Display confirmation dialouge when -O is passed without filter
       if !@options[:grep] && options.overwrite
-        confirm_action "This will overwrite all existing expected results."
-        #unless yes? "This will overwrite all existing expected results."
-        #  say 'Aborting...'
-        #  exit 1
-        #end
+        unless yes? "This will overwrite all existing expected results."
+          say 'Aborting...'
+          exit 1
+        end
       end
 
       if @options[:grep]
@@ -82,20 +81,7 @@ module RComp
         run_suite(load_suite, :generate, @options)
       end
     end
+
     map "g" => :generate
-
-
-    private
-
-    def confirm_action(warning)
-      puts warning
-      print 'Are you sure? (Y/N) '
-      confirm = STDIN.gets.chomp
-
-      unless confirm.downcase == 'y'
-        say 'Aborting...'
-        exit 1
-      end
-    end
   end
 end
