@@ -8,13 +8,21 @@ Feature: Test
     And the exit status should be 1
 
   Scenario: Test without init
-    Given I run `rcomp c ./exec`
+    Given a file named ".rcomp" with:
+      """
+      command: ./test_exec
+
+      """
     When I run `rcomp test`
     Then the output should contain "No RComp directory"
     And the exit status should be 1
 
   Scenario: Test with partial init
-    Given I run `rcomp c ./exec`
+    Given a file named ".rcomp" with:
+      """
+      command: ./test_exec
+
+      """
     And a directory named "rcomp"
     And a directory named "rcomp/tests"
     When I run `rcomp test`

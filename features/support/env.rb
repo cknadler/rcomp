@@ -30,25 +30,23 @@ end
 Before('@basic-conf') do
   create_executable
   # Spin up basic RComp configuration
-  run_simple('rcomp c ./test_exec', false)
-  run_simple('rcomp init', false)
+  write_file(".rcomp", "command: ./test_exec\n")
+  run_simple('rcomp init')
 end
 
 Before('@err-conf') do
   create_err_executable
   # Spin up RComp configuraton with an erroring executable
-  run_simple('rcomp c ./test_exec', false)
-  run_simple('rcomp init', false)
+  write_file(".rcomp", "command: ./test_exec\n")
+  run_simple('rcomp init')
 end
 
 Before('@custom-conf') do
   create_executable
   # Spin up custom path RComp configuration
-  run_simple('mkdir test', false)
-  run_simple('mkdir test/integration', false)
-  run_simple('rcomp d test/integration/rcomp')
-  run_simple('rcomp c ./test_exec', false)
-  run_simple('rcomp init', false)
+  write_file(".rcomp", 
+             "command: ./test_exec\ndirectory: test/integration/rcomp\n")
+  run_simple('rcomp init')
 end
 
 Before('@load-assorted-tests') do

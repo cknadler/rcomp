@@ -26,6 +26,12 @@ module RComp
       end
     end
 
+    def mkpath(path)
+      unless File.exists? path
+        FileUtils.mkpath path
+      end
+    end
+
     def touch(path)
       unless File.exist? path
         FileUtils.touch path

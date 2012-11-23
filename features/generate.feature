@@ -8,13 +8,21 @@ Feature: Generate
     And the exit status should be 1
 
   Scenario: Generate without init
-    Given I run `rcomp c ./exec`
+    Given a file named ".rcomp" with:
+      """
+      command: ./test_exec
+
+      """
     When I run `rcomp generate`
     Then the output should contain "No RComp directory"
     And the exit status should be 1
 
   Scenario: Generate with partial init
-    Given I run `rcomp c ./exec`
+    Given a file named ".rcomp" with:
+      """
+      command: ./test_exec
+
+      """
     And a directory named "rcomp"
     And a directory named "rcomp/tests"
     When I run `rcomp generate`
