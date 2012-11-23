@@ -8,14 +8,15 @@ module RComp
     include RComp::Actions
 
     attr_reader :root, :test_root, :result_root, :expected_root, 
-                :command
+                :command, :ignore
 
     # Conf file path
     CONF_PATH = '.rcomp'
 
     # Valid configuraiton keys
     VALID_KEYS = ['directory',
-                  'command']
+                  'command',
+                  'ignore']
 
     # Initialize a new config object
     #
@@ -29,6 +30,8 @@ module RComp
 
       # Load configuration values into attributes
       @command = @conf['command']
+      @ignore = @conf['ignore']
+      @ignore ||= []
       @root = @conf['directory']
       @test_root = @root + '/tests'
       @result_root = @root + '/results'

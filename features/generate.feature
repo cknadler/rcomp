@@ -219,6 +219,60 @@ Feature: Generate
     Then the output should contain "2 files (2 generated)"
     And the exit status should be 0
 
+  # ignore from config
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with config ignore filter set: catches all
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - xyz
+      
+      """
+    When I run `rcomp g`
+    Then the output should contain "3 files (2 skipped, 1 generated)"
+    And the exit status should be 0
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with config ignore filter set: catches some
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - foo
+
+      """
+    When I run `rcomp g`
+    Then the output should contain "2 files (2 skipped)"
+    And the exit status should be 0
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with config ignore filter set: catches none
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - test
+
+      """
+    When I run `rcomp g`
+    Then the output should contain "0 files ()"
+    And the exit status should be 0
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with multiple config ignore filters set
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - test_a
+        - test_b
+
+      """
+    When I run `rcomp g`
+    Then the output should contain "1 file (1 generated)"
+    And the exit status should be 0
+
   # custom generate directory
   @custom-conf
   Scenario: Custom conf generate

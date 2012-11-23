@@ -159,6 +159,60 @@ Feature: Test
     Then the output should contain "0 tests ()"
     And the exit status should be 0
 
+  # ignore from config
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with config ignore filter set: catches all
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - xyz
+      
+      """
+    When I run `rcomp t`
+    Then the output should contain "3 tests (1 failed, 1 skipped, 1 passed)"
+    And the exit status should be 1
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with config ignore filter set: catches some
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - foo
+
+      """
+    When I run `rcomp t`
+    Then the output should contain "2 tests (1 failed, 1 passed)"
+    And the exit status should be 1
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with config ignore filter set: catches none
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - test
+
+      """
+    When I run `rcomp t`
+    Then the output should contain "0 tests ()"
+    And the exit status should be 0
+
+  @basic-conf
+  @load-assorted-tests
+  Scenario: Test with multiple config ignore filters set
+    Given I append to ".rcomp" with:
+      """
+      ignore:
+        - test_a
+        - test_b
+
+      """
+    When I run `rcomp t`
+    Then the output should contain "1 test (1 skipped)"
+    And the exit status should be 0
+
   # custom tests directory
   @custom-conf
   Scenario: Custom conf test

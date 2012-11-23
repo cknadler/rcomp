@@ -5,6 +5,8 @@ module RComp
 
     include RComp::Path
 
+    @@conf = Conf.instance
+
     # Create a test suite
     #
     # pattern - A pattern to filter the tests that are added to the suite
@@ -14,7 +16,7 @@ module RComp
       tests = []
 
       # Find all tests in the tests directory
-      Find.find Conf.instance.test_root do |path|
+      Find.find @@conf.test_root do |path|
         # recurse into all subdirectories
         next if File.directory? path
 
@@ -26,10 +28,25 @@ module RComp
         # ignore dotfiles
         next if File.basename(path).match(/^\..*/)
 
+        # ignore files in ignore filter
+        next if ignored?(path)
+
         tests << Test.new(path)
       end
 
       tests
+    end
+
+    # Checks all ignore patterns against a given relative path
+    #
+    # path - A relative path of a test
+    #
+    # Returns true if any patterns match the path, false otherwise
+    def ignored?(path)
+      @@conf.ignore.each do |ignore|
+        return true if rel_path(path).match(ignore)
+      end
+      false
     end
   end
 end
