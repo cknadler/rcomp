@@ -44,34 +44,26 @@ module RComp
     end
 
     def summary
-      case @type
-      when :test
-        print_test_summary
-      when :generate
-        print_generate_summary
-      end
+      print_summary
       exit 1 if @failed > 0
     end
 
     private
 
-    def print_test_summary
+    def print_summary
       desc = []
-      summary = "#{plural((@failed + @skipped + @success), 'test')} ("
-      desc << "#{@failed} failed" unless @failed == 0
-      desc << "#{@skipped} skipped" unless @skipped == 0
-      desc << "#{@success} passed" unless @success == 0
-      summary += desc.join(", ") + ")"
-      puts summary
-    end
+      tests = @failed + @skipped + @success
 
-    def print_generate_summary
-      desc = []
-      summary = "#{plural((@failed + @skipped + @success), 'file')} ("
+      summary = "#{plural(tests, @type == :test ? 'test' : 'file')} ("
+
       desc << "#{@failed} failed" unless @failed == 0
       desc << "#{@skipped} skipped" unless @skipped == 0
-      desc << "#{@success} generated" unless @success == 0
+      if @success != 0
+        desc << "#{@success} #{@type == :test ? 'passed' : 'generated'}" 
+      end
+
       summary += desc.join(", ") + ")"
+
       puts summary
     end
   end
