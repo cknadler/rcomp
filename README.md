@@ -14,13 +14,11 @@ $ gem install rcomp
 ```
 $ rcomp
 Tasks:
-  rcomp generate             # Generate expected output for all tests
-  rcomp help [TASK]          # Describe available tasks or one specific task
-  rcomp init                 # Setup rcomp test directory
-  rcomp set_command COMMAND  # Sets the command RComp will run tests with
-  rcomp set_directory PATH   # Set the directory RComp will store files
-  rcomp test                 # Run all tests
-  rcomp version              # Prints RComp's version information
+  rcomp generate     # Generate expected output for all tests
+  rcomp help [TASK]  # Describe available tasks or one specific task
+  rcomp init         # Setup rcomp test directory
+  rcomp test         # Run all tests
+  rcomp version      # Prints RComp's version information
 ```
 
 ## Setup
@@ -28,7 +26,6 @@ Tasks:
 In your project root directory, run:
 
 ```
-$ rcomp set-command ./some-executable
 $ rcomp init
 ```
 
@@ -57,7 +54,7 @@ Managed by RComp. Stores the results of your most recent test suite run.
 
 ---
 
-A simple RComp suite might look something like this:
+A simple RComp suite might look something like:
 
 ```
 .
@@ -75,7 +72,7 @@ A simple RComp suite might look something like this:
 
 ## Configuration
 
-All custom configuration is stored in a `.rcomp` file as YAML
+All custom configuration is stored in `.rcomp` as YAML
 
 <table>
   <th>Setting</th><th>Config</th><th>Default</th><th>Description</th>
@@ -91,6 +88,23 @@ All custom configuration is stored in a `.rcomp` file as YAML
     <td><code>rcomp</code></td>
     <td>Directory RComp will store tests, results and expected in</td>
   </tr>
+  <tr>
+  	<td>ignore</td>
+  	<td>
+  	  <code>
+  	    ignore:
+  	  	  - [PATTERN]
+  	  </code>
+  	</td>
+  	<td></td>
+  	<td>List of patterns RComp will ignore when finding tests</td>
+  </tr>
+  <tr>
+  	<td>timeout</td>
+  	<td><code>timeout: [TIMEOUT]</code></td>
+  	<td><code>5</code></td>
+  	<td>Test execution time limit (seconds)</td>
+  </tr>
 </table>
 
 ## Aliases
@@ -104,14 +118,6 @@ All custom configuration is stored in a `.rcomp` file as YAML
   <tr>
     <td><code>generate</code></td>
     <td><code>g</code></td>
-  </tr>
-  <tr>
-    <td><code>set-command</code></td>
-    <td><code>c</code></td>
-  </tr>
-  <tr>
-    <td><code>set-directory</code></td>
-    <td><code>d</code></td>
   </tr>
   <tr>
     <td><code>version</code></td>
