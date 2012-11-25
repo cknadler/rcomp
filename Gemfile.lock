@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rcomp (0.1.1)
+    rcomp (0.2.0)
       childprocess (~> 0.3.6)
       thor (~> 0.16.0)
 
