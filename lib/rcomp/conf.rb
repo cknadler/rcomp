@@ -8,7 +8,7 @@ module RComp
     include RComp::Actions
 
     attr_reader :root, :test_root, :result_root, :expected_root, 
-                :command, :ignore
+                :command, :ignore, :timeout
 
     # Conf file path
     CONF_PATH = '.rcomp'
@@ -16,22 +16,27 @@ module RComp
     # Valid configuraiton keys
     VALID_KEYS = ['directory',
                   'command',
-                  'ignore']
+                  'ignore',
+                  'timeout']
+
+    # Default configuration options
+    DEFAULT = { 'directory' => 'rcomp',
+                'timeout'   => 5 }
 
     # Initialize a new config object
     #
     # Loads options from config file, merges with defaults
     # and stores everything in memory
     def initialize
-      # Set default options and overwrite with config file options
-      @default = { 'directory' => 'rcomp' }
+      # Load custom configuration and merge it with defaults
       @custom = read_conf_file
-      @conf = @default.merge(@custom)
+      @conf = DEFAULT.merge(@custom)
 
       # Load configuration values into attributes
       @command = @conf['command']
       @ignore = @conf['ignore']
       @ignore ||= []
+      @timeout = @conf['timeout']
       @root = @conf['directory']
       @test_root = @root + '/tests'
       @result_root = @root + '/results'

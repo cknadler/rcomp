@@ -258,3 +258,43 @@ Feature: Test
     When I run `rcomp test`
     Then the output should contain "3 tests (1 failed, 1 skipped, 1 passed)"
     And the exit status should be 1
+
+  # timeout
+  @loop-conf
+  Scenario: Test hanging test with default timeout
+    Given a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    And a file named "rcomp/expected/test1.out" with:
+      """
+      ABC
+
+      """
+    When I run `rcomp test` for up to 6 seconds
+    Then the output should contain "1 test (1 failed)"
+    And the output should contain "timeout : /test1"
+    And the exit status should be 1
+
+  @loop-conf
+  Scenario: Test hanging test with custom timeout
+    Given I append to ".rcomp" with:
+      """
+      timeout: 1
+
+      """
+    And a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    And a file named "rcomp/expected/test1.out" with:
+      """
+      ABC
+
+      """
+    When I run `rcomp test` for up to 2 seconds
+    Then the output should contain "1 test (1 failed)"
+    And the output should contain "timeout : /test1"
+    And the exit status should be 1

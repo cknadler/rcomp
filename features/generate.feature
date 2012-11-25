@@ -313,3 +313,33 @@ Feature: Generate
     When I run `rcomp generate`
     Then the output should contain "3 files (2 skipped, 1 generated)"
     And the exit status should be 0
+
+  # timeout
+  @loop-conf
+  Scenario: Test hanging test with default timeout
+    Given a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    When I run `rcomp generate` for up to 6 seconds
+    Then the output should contain "1 file (1 failed)"
+    And the output should contain "timeout : /test1"
+    And the exit status should be 1
+
+  @loop-conf
+  Scenario: Test hanging test with custom timeout
+    Given I append to ".rcomp" with:
+      """
+      timeout: 1
+
+      """
+    And a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    When I run `rcomp generate` for up to 2 seconds
+    Then the output should contain "1 file (1 failed)"
+    And the output should contain "timeout : /test1"
+    And the exit status should be 1

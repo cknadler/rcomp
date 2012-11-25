@@ -21,9 +21,9 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency("thor", "~> 0.16.0")
-  
-  s.add_development_dependency("rake")
-  s.add_development_dependency("cucumber", "~> 1.2.1")
-  s.add_development_dependency("aruba", "~> 0.5.0")
+  s.add_runtime_dependency "thor", "~> 0.16.0"
+  s.add_runtime_dependency "childprocess", "~> 0.3.6"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "cucumber", "~> 1.2.1"
+  s.add_development_dependency "aruba", "~> 0.5.0"
 end

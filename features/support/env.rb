@@ -4,20 +4,23 @@ require 'aruba/cucumber'
 require 'test/unit/assertions'
 
 # Helpers
-def create_executable
-  content = "#!/usr/bin/env ruby\nputs IO.binread(ARGV[0])"
+def create_executable(content)
   write_file("test_exec", content)
   in_current_dir do
     FileUtils.chmod(0755, "test_exec")
   end
 end
 
-def create_err_executable
-  content = "#!/usr/bin/env ruby\n$stderr.puts IO.binread(ARGV[0])"
-  write_file("test_exec", content)
-  in_current_dir do
-    FileUtils.chmod(0755, "test_exec")
-  end
+def basic_executable
+  "#!/usr/bin/env ruby\nputs IO.binread(ARGV[0])"
+end
+
+def err_executable
+  "#!/usr/bin/env ruby\n$stderr.puts IO.binread(ARGV[0])"
+end
+
+def loop_executable
+  "!#/usr/bin/env ruby\nsleep 30"
 end
 
 def create_assorted_tests
@@ -28,24 +31,30 @@ end
 
 # Custom Tags
 Before('@basic-conf') do
-  create_executable
+  create_executable(basic_executable)
   # Spin up basic RComp configuration
   write_file(".rcomp", "command: ./test_exec\n")
   run_simple('rcomp init')
 end
 
 Before('@err-conf') do
-  create_err_executable
+  create_executable(err_executable)
   # Spin up RComp configuraton with an erroring executable
   write_file(".rcomp", "command: ./test_exec\n")
   run_simple('rcomp init')
 end
 
 Before('@custom-conf') do
-  create_executable
+  create_executable(basic_executable)
   # Spin up custom path RComp configuration
   write_file(".rcomp", 
              "command: ./test_exec\ndirectory: test/integration/rcomp\n")
+  run_simple('rcomp init')
+end
+
+Before('@loop-conf') do
+  create_executable(loop_executable)
+  write_file(".rcomp", "command: ./test_exec\n")
   run_simple('rcomp init')
 end
 

@@ -19,15 +19,13 @@ module RComp
       suite.each do |test|
         case type
         when :test
-          if expected_exists?(test)
-            run_test(test)
-          end
+          run(test) if expected_exists?(test)
 
         when :generate
           if expected_exists?(test)
-            run_generate(test) if options[:overwrite]
+            run(test, true) if options[:overwrite]
           else
-            run_generate(test)
+            run(test, true)
           end
         end
 
@@ -50,28 +48,28 @@ module RComp
         File.exists?(test.expected_err_path)
     end
 
-    # Run a test storing it's result out and err
+    # Test or generate output for a specified test
     #
     # test - A Test object
+    # generate - Flag for running generate. Runs test otherwise.
     #
     # Returns nothing
-    def run_test(test)
-      mkpath_to test.result_out_path
-      mkpath_to test.result_err_path
-      system "#{@conf.command} #{test.test_path} > #{test.result_out_path} 2> #{test.result_err_path}"
-      test.result = compare_output(test) 
-    end
+    def run(test, generate=false)
+      generate ? mkpath_to(test.expected_out_path) :
+        mkpath_to(test.result_out_path)
 
-    # Generate expected output for a test
-    #
-    # test - A Test object
-    #
-    # Returns nothing
-    def run_generate(test)
-      mkpath_to test.expected_out_path
-      mkpath_to test.expected_err_path
-      system "#{@conf.command} #{test.test_path} > #{test.expected_out_path} 2> #{test.expected_err_path}"
-      test.result = :success
+      # Create process and run
+      cmd = [@conf.command, test.test_path]
+      out = generate ? test.expected_out_path : test.result_out_path
+      err = generate ? test.expected_err_path : test.result_err_path
+      process = Process.new(cmd, @conf.timeout, out, err)
+      process.run
+
+      if process.timedout?
+        test.result = :timedout
+      else
+        test.result = generate ? :success : compare_output(test) 
+      end
     end
 
     # Compare the result and expected output of a test that has been run

@@ -19,30 +19,26 @@ module RComp
       case test.result
       # success
       when :success
-        case @type
-        when :test
-          puts "\t passed : #{test.relative_path}"
-        when :generate
+        if @type == :test
+          puts "\tpassed : #{test.relative_path}"
+        else
           puts "\tgenerated : #{test.relative_path}"
         end
         @success += 1
 
       # skipped
       when :skipped
-        case @type
-        when :test
-          puts "\tskipped : #{test.relative_path}"
-        when :generate
-          puts "\t  skipped : #{test.relative_path}"
-        end
+        puts "\tskipped : #{test.relative_path}"
         @skipped += 1
 
       # failed
       when :failed
-        case @type
-        when :test
-          puts "\t failed : #{test.relative_path}"
-        end
+        puts "\tfailed : #{test.relative_path}"
+        @failed += 1
+
+      # timedout
+      when :timedout
+        puts "\ttimeout : #{test.relative_path}"
         @failed += 1
       end
     end
@@ -71,7 +67,8 @@ module RComp
 
     def print_generate_summary
       desc = []
-      summary = "#{plural((@skipped + @success), 'file')} ("
+      summary = "#{plural((@failed + @skipped + @success), 'file')} ("
+      desc << "#{@failed} failed" unless @failed == 0
       desc << "#{@skipped} skipped" unless @skipped == 0
       desc << "#{@success} generated" unless @success == 0
       summary += desc.join(", ") + ")"

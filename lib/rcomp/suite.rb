@@ -34,7 +34,7 @@ module RComp
         tests << Test.new(path)
       end
 
-      tests
+      return tests
     end
 
     # Checks all ignore patterns against a given relative path
@@ -46,7 +46,7 @@ module RComp
       @@conf.ignore.each do |ignore|
         return true if rel_path(path).match(ignore)
       end
-      false
+      return false
     end
   end
 end
