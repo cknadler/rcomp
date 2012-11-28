@@ -34,8 +34,7 @@ module RComp
 
       # Load configuration values into attributes
       @command = @conf['command']
-      @ignore = @conf['ignore']
-      @ignore ||= []
+      @ignore = @conf['ignore'] || []
       @timeout = @conf['timeout']
       @root = @conf['directory']
       @test_root = @root + '/tests'

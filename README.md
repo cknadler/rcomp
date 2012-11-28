@@ -54,7 +54,7 @@ Managed by RComp. Stores the results of your most recent test suite run.
 
 ---
 
-A simple RComp suite might look something like:
+A simple RComp suite might look like:
 
 ```
 .
