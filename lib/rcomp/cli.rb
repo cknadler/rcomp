@@ -17,13 +17,13 @@ module RComp
     
     desc "init", "Setup rcomp test directory"
     def init
-      Initializer.guard_initialized
+      Env.guard_initialized
 
-      unless Initializer.command_exists?
+      unless Env.command_exists?
         @conf.set_command(ask("Enter the command you want to test:"))
       end
 
-      Initializer.initialize_directories
+      Env.initialize_directories
       puts "RComp successfully initialized"
     end
 
@@ -41,7 +41,7 @@ module RComp
       :type => :string,
       :desc => "Only test files that match pattern"
     def test
-      Initializer.guard_uninitialized
+      Env.guard_uninitialized
       if @options[:grep]
         Runner.run(Suite.load(@options[:grep]), :test)
       else
@@ -62,7 +62,7 @@ module RComp
       :aliases => "-O",
       :desc => "Overwrite expected output file for test if present"
     def generate
-      Initializer.guard_uninitialized
+      Env.guard_uninitialized
 
       # Display confirmation dialouge when -O is passed without filter
       if !@options[:grep] && options.overwrite

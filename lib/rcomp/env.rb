@@ -1,5 +1,5 @@
 module RComp
-  module Initializer
+  module Env
 
     extend self
     extend Actions
