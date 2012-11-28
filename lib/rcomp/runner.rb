@@ -3,7 +3,8 @@ require 'fileutils'
 module RComp
   module Runner
 
-    include RComp::Actions
+    extend self
+    extend Actions
     
     # Run a suite of tests
     #
@@ -12,20 +13,20 @@ module RComp
     # options - A Hash of runner options
     #
     # Returns nothing
-    def run_suite(suite, type, options={})
+    def run(suite, type, options={})
       @conf = Conf.instance
       reporter = Reporter.new(type)
 
       suite.each do |test|
         case type
         when :test
-          run(test) if expected_exists?(test)
+          run_test(test) if expected_exists?(test)
 
         when :generate
           if expected_exists?(test)
-            run(test, true) if options[:overwrite]
+            run_test(test, true) if options[:overwrite]
           else
-            run(test, true)
+            run_test(test, true)
           end
         end
 
@@ -54,7 +55,7 @@ module RComp
     # generate - Flag for running generate. Runs test otherwise.
     #
     # Returns nothing
-    def run(test, generate=false)
+    def run_test(test, generate=false)
       generate ? mkpath_to(test.expected_out_path) :
         mkpath_to(test.result_out_path)
 

@@ -3,7 +3,8 @@ require 'find'
 module RComp
   module Suite
 
-    include RComp::Path
+    extend self
+    extend Path
 
     @@conf = Conf.instance
 
@@ -12,7 +13,7 @@ module RComp
     # pattern - A pattern to filter the tests that are added to the suite
     #
     # Returns an Array of Test objects
-    def load_suite(pattern='')
+    def load(pattern=nil)
       tests = []
 
       # Find all tests in the tests directory
@@ -21,7 +22,7 @@ module RComp
         next if File.directory? path
 
         # filter tests by pattern if present
-        unless pattern.empty?
+        if pattern
           next unless rel_path(path).match(pattern)
         end
 
@@ -36,6 +37,8 @@ module RComp
 
       return tests
     end
+
+    private
 
     # Checks all ignore patterns against a given relative path
     #

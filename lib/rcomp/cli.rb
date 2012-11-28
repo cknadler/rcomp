@@ -4,9 +4,6 @@ module RComp
   class CLI < Thor
 
     include Thor::Actions
-    include RComp::Runner
-    include RComp::Suite
-    include RComp::Initializer
 
     def initialize(args=[], options={}, config={})
       super
@@ -20,13 +17,13 @@ module RComp
     
     desc "init", "Setup rcomp test directory"
     def init
-      guard_initialized
+      Initializer.guard_initialized
 
-      unless command_exists?
+      unless Initializer.command_exists?
         @conf.set_command(ask("Enter the command you want to test:"))
       end
 
-      initialize_directories
+      Initializer.initialize_directories
       puts "RComp successfully initialized"
     end
 
@@ -44,11 +41,11 @@ module RComp
       :type => :string,
       :desc => "Only test files that match pattern"
     def test
-      guard_uninitialized
+      Initializer.guard_uninitialized
       if @options[:grep]
-        run_suite(load_suite(@options[:grep]), :test)
+        Runner.run(Suite.load(@options[:grep]), :test)
       else
-        run_suite(load_suite, :test)
+        Runner.run(Suite.load, :test)
       end
     end
 
@@ -65,7 +62,7 @@ module RComp
       :aliases => "-O",
       :desc => "Overwrite expected output file for test if present"
     def generate
-      guard_uninitialized
+      Initializer.guard_uninitialized
 
       # Display confirmation dialouge when -O is passed without filter
       if !@options[:grep] && options.overwrite
@@ -76,9 +73,9 @@ module RComp
       end
 
       if @options[:grep]
-        run_suite(load_suite(@options[:grep]), :generate, @options)
+        Runner.run(Suite.load(@options[:grep]), :generate, @options)
       else
-        run_suite(load_suite, :generate, @options)
+        Runner.run(Suite.load, :generate, @options)
       end
     end
 

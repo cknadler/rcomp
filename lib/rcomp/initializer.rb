@@ -1,7 +1,8 @@
 module RComp
   module Initializer
 
-    include RComp::Actions
+    extend self
+    extend Actions
 
     @@conf = Conf.instance
 
@@ -33,9 +34,7 @@ module RComp
       mkdir @@conf.expected_root
       mkdir @@conf.result_root
     end
-
-    private
-
+    
     # Checks for the existance of a command to test with
     #
     # Returns a boolean
@@ -43,6 +42,8 @@ module RComp
       @@conf.command
     end
 
+    private
+    
     # Checks for the existance of RComp's root directory
     #
     # Returns a boolean
@@ -57,7 +58,7 @@ module RComp
     def root_subdirs_exist?
       File.exists?(@@conf.test_root) && 
       File.exists?(@@conf.result_root) && 
-      File.exists?(@conf.expected_root)
+      File.exists?(@@conf.expected_root)
     end
 
     # Checks to see if RComp is fully initialized
