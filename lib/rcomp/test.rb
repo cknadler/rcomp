@@ -8,6 +8,8 @@ module RComp
 
     attr_accessor :result
 
+    attr_accessor :out_result, :err_result
+
     # Initialize a new Test
     #
     # path - The absolute path to the test
@@ -22,6 +24,14 @@ module RComp
       @result_err_path = result_path(path, :err)
       @expected_out_path = expected_path(path, :out)
       @expected_err_path = expected_path(path, :err)
+    end
+
+    def expected_out_exists?
+      @expected_out_exists ||= File.exists?(@expected_out_path)
+    end
+
+    def expected_err_exists?
+      @expected_err_exists ||= File.exists?(@expected_err_path)
     end
   end
 end

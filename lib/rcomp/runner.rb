@@ -17,6 +17,8 @@ module RComp
       @conf = Conf.instance
       reporter = Reporter.new(type)
 
+      reporter.header
+
       suite.each do |test|
         case type
         when :test
@@ -45,8 +47,7 @@ module RComp
     #
     # Returns a boolean
     def expected_exists?(test)
-      File.exists?(test.expected_out_path) ||
-        File.exists?(test.expected_err_path)
+      test.expected_out_exists? || test.expected_err_exists?
     end
 
     # Test or generate output for a specified test
@@ -56,10 +57,12 @@ module RComp
     #
     # Returns nothing
     def run_test(test, generate=false)
+      # Create output path if it doens't exist
       generate ? mkpath_to(test.expected_out_path) :
         mkpath_to(test.result_out_path)
 
       # Create process and run
+      # Handle the difference in path between a test and generate process
       cmd = [@conf.command, test.test_path]
       out = generate ? test.expected_out_path : test.result_out_path
       err = generate ? test.expected_err_path : test.result_err_path
@@ -68,36 +71,59 @@ module RComp
 
       if process.timedout?
         test.result = :timedout
-      else
-        test.result = generate ? :success : compare_output(test) 
+        return
       end
+
+      test.result = generate ? :success : cmp_output(test) 
     end
 
     # Compare the result and expected output of a test that has been run
     #
     # test - A Test object that has been run
-    # precondition: expected_exists?(test) is true
+    # precondition :: expected_exists?(test) is true
     #
-    # Returns a Symbol, :success or :failure, conditionally if the test passed
-    def compare_output(test)
-      exp_out_exists = File.exists?(test.expected_out_path)
-      exp_err_exists = File.exists?(test.expected_err_path)
+    # Returns success or failure as a symbol
+    def cmp_output(test)
+      # test out and err
+      if test.expected_out_exists? && test.expected_err_exists?
+        cmp_out(test)
+        cmp_err(test)
+        return :success if (test.out_result && test.err_result)
 
-      if exp_out_exists && exp_err_exists # test out and err
-        if FileUtils.identical?(test.expected_out_path, test.result_out_path) &&
-          FileUtils.identical?(test.expected_err_path, test.result_err_path)
-          return :success
-        end
-      elsif exp_out_exists # test only out
-        if FileUtils.identical?(test.expected_out_path, test.result_out_path)
-          return :success
-        end
-      else # test only err
-        if FileUtils.identical?(test.expected_err_path, test.result_err_path)
-          return :success
-        end
+      # test only out
+      elsif test.expected_out_exists?
+        cmp_out(test)
+        return :success if test.out_result
+
+      # test only err
+      else
+        cmp_err(test)
+        return :success if test.err_result
       end
+
       return :failed
+    end
+
+    # Compare a tests expected and result stdout
+    # Sets the result of the comparison to out_result in the test
+    #
+    # test - A test object that has been run
+    #
+    # Returns nothing
+    def cmp_out(test)
+      test.out_result = FileUtils.cmp(test.expected_out_path, 
+                                      test.result_out_path)
+    end
+
+    # Compare a tests expected and result stderr
+    # Sets the result of the comparison to err_result in the test
+    #
+    # test - A test object that has been run
+    #
+    # Returns nothing
+    def cmp_err(test)
+      test.err_result = FileUtils.cmp(test.expected_err_path,
+                                      test.result_err_path)
     end
   end
 end
