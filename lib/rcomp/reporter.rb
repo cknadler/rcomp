@@ -3,8 +3,9 @@ module RComp
 
     include RComp::Helper
 
-    GEN_PADDING = ' ' * 1
-    TEST_PADDING = ' ' * 3
+    PADDING = 4
+    GEN_JUSTIFY = 12 + PADDING
+    TEST_JUSTIFY = 10 + PADDING
 
     # Initialize a new Reporter
     #
@@ -28,22 +29,31 @@ module RComp
       case test.result
       when :success
         if @type == :test
-          puts "passed : #{test.relative_path}"
+          print_test_success(test)
         else
-          puts "generated : #{test.relative_path}"
+          print_generate_success(test)
         end
         @success << test
 
       when :skipped
-        puts "skipped : #{test.relative_path}"
+        if @type == :test
+          print_test_skipped(test)
+        else
+          print_generate_skipped(test)
+        end
         @skipped << test
 
+      # Generate can't fail directly
       when :failed
-        puts "failed : #{test.relative_path}"
+        print_test_failed(test)
         @failed << test
 
       when :timedout
-        puts "timeout : #{test.relative_path}"
+        if @type == :test
+          print_test_timeout(test)
+        else
+          print_generate_timeout(test)
+        end
         @failed << test
       end
     end
@@ -72,6 +82,34 @@ module RComp
     end
 
     private
+
+    def print_test_success(test)
+      puts "passed : ".rjust(TEST_JUSTIFY) + test.relative_path
+    end
+
+    def print_generate_success(test)
+      puts "generated : ".rjust(GEN_JUSTIFY) + test.relative_path
+    end
+
+    def print_test_skipped(test)
+      puts "skipped : ".rjust(TEST_JUSTIFY) + test.relative_path
+    end
+
+    def print_generate_skipped(test)
+      puts "skipped : ".rjust(GEN_JUSTIFY) + test.relative_path
+    end
+
+    def print_test_failed(test)
+      puts "failed : ".rjust(TEST_JUSTIFY) + test.relative_path
+    end
+
+    def print_test_timeout(test)
+      puts "timeout : ".rjust(TEST_JUSTIFY) + test.relative_path
+    end
+
+    def print_generate_timeout(test)
+      puts "timeout : ".rjust(GEN_JUSTIFY) + test.relative_path
+    end
 
     def print_summary
       desc = []
