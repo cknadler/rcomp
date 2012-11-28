@@ -57,7 +57,7 @@ module RComp
     #
     # Returns nothing
     def write_conf_file
-      touch CONF_PATH unless File.exists?(CONF_PATH)
+      touch CONF_PATH
       conf_file = File.open(CONF_PATH, 'w')
       conf_file.puts YAML.dump @custom
     end

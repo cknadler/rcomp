@@ -33,9 +33,7 @@ module RComp
     end
 
     def touch(path)
-      unless File.exist? path
-        FileUtils.touch path
-      end
+      FileUtils.touch path
     end
   end
 end
