@@ -4,7 +4,8 @@ module RComp
     include RComp::Path
 
     attr_reader :test_path, :result_out_path, :result_err_path,
-                :expected_out_path, :expected_err_path, :relative_path
+                :expected_out_path, :expected_err_path, :relative_path,
+                :formatted_path
 
     attr_accessor :result, :out_result, :err_result
 
@@ -18,10 +19,11 @@ module RComp
       @result = :skipped
       @relative_path = rel_path(path)
       @test_path = path
-      @result_out_path = result_path(path, :out)
-      @result_err_path = result_path(path, :err)
-      @expected_out_path = expected_path(path, :out)
-      @expected_err_path = expected_path(path, :err)
+      @result_out_path = get_path(:result, path, '.out')
+      @result_err_path = get_path(:result, path, '.err')
+      @expected_out_path = get_path(:expected, path, '.out')
+      @expected_err_path = get_path(:expected, path, '.err')
+      @formatted_path = format_path(@relative_path)
     end
 
     def expected_out_exists?
@@ -30,6 +32,29 @@ module RComp
 
     def expected_err_exists?
       @expected_err_exists ||= File.exists?(@expected_err_path)
+    end
+
+    private
+
+    def get_path(type, test_path, extension)
+      cmpnts = []
+      if type == :result
+        cmpnts << Conf.instance.result_root
+      else
+        cmpnts << Conf.instance.expected_root
+      end
+      cmpnts << rel_path(File.dirname(test_path))
+      cmpnts << File.basename(test_path, ".*") + extension
+      File.join(cmpnts)
+    end
+
+    # Formats relative path for user output
+    #
+    # path - A relative test path
+    #
+    # Returns formatted path
+    def format_path(path)
+      path[1..-1]
     end
   end
 end

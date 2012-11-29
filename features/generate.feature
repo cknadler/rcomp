@@ -326,7 +326,7 @@ Feature: Generate
       """
     When I run `rcomp generate` for up to 6 seconds
     Then the output should contain "1 file (1 failed)"
-    And the output should contain "timeout : /test1"
+    And the output should contain "timeout : test1.test"
     And the exit status should be 1
 
   @loop-conf
@@ -343,5 +343,5 @@ Feature: Generate
       """
     When I run `rcomp generate` for up to 2 seconds
     Then the output should contain "1 file (1 failed)"
-    And the output should contain "timeout : /test1"
+    And the output should contain "timeout : test1.test"
     And the exit status should be 1

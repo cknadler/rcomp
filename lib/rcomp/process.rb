@@ -22,12 +22,14 @@ module RComp
     #
     # Returns nothing
     def run
-      begin @process.start
+      begin 
+        @process.start
       rescue ChildProcess::LaunchError => e
         raise StandardError.new(e.message)
       end
 
-      begin @process.poll_for_exit(@timeout)
+      begin 
+        @process.poll_for_exit(@timeout)
       rescue ChildProcess::TimeoutError
         @timedout = true
         @process.stop(@timeout)

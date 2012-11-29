@@ -87,23 +87,23 @@ module RComp
     private
 
     def print_test_success(test)
-      say "passed : ".rjust(TEST_JUSTIFY) + test.relative_path, :green
+      say "passed : ".rjust(TEST_JUSTIFY) + test.formatted_path, :green
     end
 
     def print_generate_success(test)
-      say "generated : ".rjust(GEN_JUSTIFY) + test.relative_path, :green
+      say "generated : ".rjust(GEN_JUSTIFY) + test.formatted_path, :green
     end
 
     def print_test_skipped(test)
-      say "skipped : ".rjust(TEST_JUSTIFY) + test.relative_path, :yellow
+      say "skipped : ".rjust(TEST_JUSTIFY) + test.formatted_path, :yellow
     end
 
     def print_generate_skipped(test)
-      say "skipped : ".rjust(GEN_JUSTIFY) + test.relative_path, :yellow
+      say "skipped : ".rjust(GEN_JUSTIFY) + test.formatted_path, :yellow
     end
 
     def print_test_failed(test)
-      msg = "failed : ".rjust(TEST_JUSTIFY) + test.relative_path
+      msg = "failed : ".rjust(TEST_JUSTIFY) + test.formatted_path
 
       # both out and err present
       if test.expected_out_exists? && test.expected_err_exists?
@@ -133,11 +133,11 @@ module RComp
     end
 
     def print_test_timeout(test)
-      say "timeout : ".rjust(TEST_JUSTIFY) + test.relative_path, :red
+      say "timeout : ".rjust(TEST_JUSTIFY) + test.formatted_path, :red
     end
 
     def print_generate_timeout(test)
-      say "timeout : ".rjust(GEN_JUSTIFY) + test.relative_path, :red
+      say "timeout : ".rjust(GEN_JUSTIFY) + test.formatted_path, :red
     end
 
     def print_summary

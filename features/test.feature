@@ -79,7 +79,7 @@ Feature: Test
 
       """
     When I run `rcomp test`
-    Then the output should contain "failed : /test1.test (out)"
+    Then the output should contain "failed : test1.test (out)"
     And the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
@@ -121,7 +121,7 @@ Feature: Test
 
       """
     When I run `rcomp test`
-    Then the output should contain "failed : /test1.test (err)"
+    Then the output should contain "failed : test1.test (err)"
     And the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
@@ -152,7 +152,7 @@ Feature: Test
 
       """
     When I run `rcomp test`
-    Then the output should contain "failed : /test1.test (out, err)"
+    Then the output should contain "failed : test1.test (out, err)"
     And the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
@@ -301,7 +301,7 @@ Feature: Test
       """
     When I run `rcomp test` for up to 6 seconds
     Then the output should contain "1 test (1 failed)"
-    And the output should contain "timeout : /test1"
+    And the output should contain "timeout : test1.test"
     And the exit status should be 1
 
   @loop-conf
@@ -323,5 +323,5 @@ Feature: Test
       """
     When I run `rcomp test` for up to 2 seconds
     Then the output should contain "1 test (1 failed)"
-    And the output should contain "timeout : /test1"
+    And the output should contain "timeout : test1.test"
     And the exit status should be 1
