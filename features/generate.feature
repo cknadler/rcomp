@@ -62,7 +62,9 @@ Feature: Generate
 
       """
     When I run `rcomp generate`
-    Then the output should contain "1 file (1 skipped)"
+    Then the output should contain "Skipped 1 file"
+    And the output should contain "Run rcomp generate -O"
+    And the output should contain "1 file (1 skipped)"
     And the file "rcomp/expected/test1.out" should contain "DEF"
     And the exit status should be 0
 
