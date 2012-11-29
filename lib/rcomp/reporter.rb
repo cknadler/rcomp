@@ -1,6 +1,9 @@
+require 'thor'
+
 module RComp
   class Reporter
 
+    include Thor::Shell
     include RComp::Helper
 
     PADDING = 4
@@ -14,9 +17,9 @@ module RComp
     # Initialize counters for all result types
     def initialize(type)
       @type = type
-      @success = []
-      @skipped = []
-      @failed = []
+      @success = 0
+      @skipped = 0
+      @failed = 0
     end
 
     # Main interface for reporting
@@ -33,7 +36,7 @@ module RComp
         else
           print_generate_success(test)
         end
-        @success << test
+        @success += 1
 
       when :skipped
         if @type == :test
@@ -41,12 +44,12 @@ module RComp
         else
           print_generate_skipped(test)
         end
-        @skipped << test
+        @skipped += 1
 
       # Generate can't fail directly
       when :failed
         print_test_failed(test)
-        @failed << test
+        @failed += 1
 
       when :timedout
         if @type == :test
@@ -54,7 +57,7 @@ module RComp
         else
           print_generate_timeout(test)
         end
-        @failed << test
+        @failed += 1
       end
     end
 
@@ -78,54 +81,103 @@ module RComp
     # Returns nothing
     def summary
       print_summary
-      exit 1 if @failed.size > 0
+      exit 1 if @failed > 0
     end
 
     private
 
     def print_test_success(test)
-      puts "passed : ".rjust(TEST_JUSTIFY) + test.relative_path
+      say "passed : ".rjust(TEST_JUSTIFY) + test.relative_path, :green
     end
 
     def print_generate_success(test)
-      puts "generated : ".rjust(GEN_JUSTIFY) + test.relative_path
+      say "generated : ".rjust(GEN_JUSTIFY) + test.relative_path, :green
     end
 
     def print_test_skipped(test)
-      puts "skipped : ".rjust(TEST_JUSTIFY) + test.relative_path
+      say "skipped : ".rjust(TEST_JUSTIFY) + test.relative_path, :yellow
     end
 
     def print_generate_skipped(test)
-      puts "skipped : ".rjust(GEN_JUSTIFY) + test.relative_path
+      say "skipped : ".rjust(GEN_JUSTIFY) + test.relative_path, :yellow
     end
 
     def print_test_failed(test)
-      puts "failed : ".rjust(TEST_JUSTIFY) + test.relative_path
+      msg = "failed : ".rjust(TEST_JUSTIFY) + test.relative_path
+
+      # both out and err present
+      if test.expected_out_exists? && test.expected_err_exists?
+        # failed both out and err cmp
+        if !test.out_result && !test.err_result
+          msg += " (out, err)"
+
+        # failed out cmp
+        elsif !test.out_result
+          msg += " (out)"
+
+        # failed err cmp
+        else
+          msg += " (err)"
+        end
+
+      # out present
+      elsif test.expected_out_exists?
+        msg += " (out)"
+
+      # err present
+      else
+        msg += " (err)"
+      end
+
+      say msg, :red
     end
 
     def print_test_timeout(test)
-      puts "timeout : ".rjust(TEST_JUSTIFY) + test.relative_path
+      say "timeout : ".rjust(TEST_JUSTIFY) + test.relative_path, :red
     end
 
     def print_generate_timeout(test)
-      puts "timeout : ".rjust(GEN_JUSTIFY) + test.relative_path
+      say "timeout : ".rjust(GEN_JUSTIFY) + test.relative_path, :red
     end
 
     def print_summary
+      # print skipped explanation if anything was skipped
+      if @skipped > 0
+        if @type == :test
+          print_skipped_test_explanation
+        else
+          print_skipped_generate_explanation
+        end
+      end
+
+      # construct and print output summary
       desc = []
-      tests = @failed.size + @skipped.size + @success.size
+      tests = @failed + @skipped + @success
 
       summary = "#{plural(tests, @type == :test ? 'test' : 'file')} ("
 
-      desc << "#{@failed.size} failed" unless @failed.empty?
-      desc << "#{@skipped.size} skipped" unless @skipped.empty?
-      unless @success.empty?
-        desc << "#{@success.size} #{@type == :test ? 'passed' : 'generated'}" 
+      desc << set_color("#{@failed} failed", :red) unless @failed == 0
+      desc << set_color("#{@skipped} skipped", :yellow) unless @skipped == 0
+      unless @success == 0
+        if @type == :test
+          desc << set_color("#{@success} passed", :green)
+        else
+          desc << set_color("#{@success} generated", :green)
+        end
       end
 
       summary += desc.join(", ") + ")"
-
       puts "\n" + summary
+    end
+
+    def print_skipped_test_explanation
+      say "\nSkipped #{plural(@skipped, 'test')} due to missing expected output"
+      say "Run rcomp generate or manually create expected output"
+    end
+
+    def print_skipped_generate_explanation
+      say "\nSkipped #{plural(@skipped, 'file')} due to existing expected output"
+      say "Run rcomp generate -O to overwrite"
     end
   end
 end

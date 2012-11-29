@@ -30,7 +30,7 @@ module RComp
       begin @process.poll_for_exit(@timeout)
       rescue ChildProcess::TimeoutError
         @timedout = true
-        @process.stop
+        @process.stop(@timeout)
       end
     end
 

@@ -6,9 +6,7 @@ module RComp
     attr_reader :test_path, :result_out_path, :result_err_path,
                 :expected_out_path, :expected_err_path, :relative_path
 
-    attr_accessor :result
-
-    attr_accessor :out_result, :err_result
+    attr_accessor :result, :out_result, :err_result
 
     # Initialize a new Test
     #

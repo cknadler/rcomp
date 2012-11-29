@@ -77,7 +77,8 @@ Feature: Test
 
       """
     When I run `rcomp test`
-    Then the output should contain "1 test (1 failed)"
+    Then the output should contain "failed : /test1.test (out)"
+    And the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
   # stdout multiple tests
@@ -118,7 +119,8 @@ Feature: Test
 
       """
     When I run `rcomp test`
-    Then the output should contain "1 test (1 failed)"
+    Then the output should contain "failed : /test1.test (err)"
+    And the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
   # stderr multiple tests
@@ -127,6 +129,29 @@ Feature: Test
   Scenario: Test multiple err: passing, skipped and failing
     When I run `rcomp test`
     Then the output should contain "3 tests (1 failed, 1 skipped, 1 passed)"
+    And the exit status should be 1
+
+  # stderr + stdout tests
+  @basic-conf
+  Scenario: Single test, failing both err and out
+    Given a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    And a file named "rcomp/expected/test1.out" with:
+      """
+      XYZ
+
+      """
+    And a file named "rcomp/expected/test1.err" with:
+      """
+      XYZ
+
+      """
+    When I run `rcomp test`
+    Then the output should contain "failed : /test1.test (out, err)"
+    And the output should contain "1 test (1 failed)"
     And the exit status should be 1
 
   # alias
