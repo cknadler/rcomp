@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Chris Knadler"]
   s.email       = ["takeshi91k@gmail.com"]
   s.homepage    = "https://github.com/cknadler/rcomp"
-  s.summary     = "A simple framework for testing command line application output."
-  s.description = "RComp tests by passing a specified command tests (files) by argument and comparing the result with expected output."
+  s.summary     = "A simple framework for testing command line application output"
+  s.description = "Command line output testing framework with dead simple tests"
 
   s.required_ruby_version     = ">= 1.9.3"
 
