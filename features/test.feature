@@ -61,7 +61,9 @@ Feature: Test
 
       """
     When I run `rcomp test`
-    Then the output should contain "1 test (1 skipped)"
+    Then the output should contain "Skipped 1 test"
+    And the output should contain "Run rcomp generate"
+    And the output should contain "1 test (1 skipped)"
     And the exit status should be 0
 
   @basic-conf
