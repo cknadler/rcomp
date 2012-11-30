@@ -5,7 +5,6 @@ module RComp
   class Conf
 
     include Singleton
-    include RComp::Actions
 
     attr_reader :root, :test_root, :result_root, :expected_root, 
                 :command, :ignore, :timeout
@@ -57,7 +56,6 @@ module RComp
     #
     # Returns nothing
     def write_conf_file
-      touch CONF_PATH
       conf_file = File.open(CONF_PATH, 'w')
       conf_file.puts YAML.dump @custom
     end
