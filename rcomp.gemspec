@@ -12,9 +12,7 @@ Gem::Specification.new do |s|
   s.summary     = "A simple framework for testing command line application output"
   s.description = "Command line output testing framework with dead simple tests"
 
-  s.required_ruby_version     = ">= 1.9.3"
-
-  s.rubyforge_project = "rcomp"
+  s.required_ruby_version = ">= 1.9.3"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -23,6 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "thor", "~> 0.16.0"
   s.add_runtime_dependency "childprocess", "~> 0.3.6"
+  
   s.add_development_dependency "rake"
   s.add_development_dependency "cucumber", "~> 1.2.1"
   s.add_development_dependency "aruba", "~> 0.5.0"
