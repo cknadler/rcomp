@@ -54,6 +54,24 @@ Feature: Test
     And the exit status should be 0
 
   @basic-conf
+  Scenario: Test with single test and no results directory
+    Given a file named "rcomp/tests/test1.test" with:
+      """
+      ABC
+
+      """
+    And a file named "rcomp/expected/test1.out" with:
+      """
+      ABC
+
+      """
+    When I remove the directory "rcomp/results"
+    Then a directory named "rcomp/results" should not exist
+    When I run `rcomp test`
+    Then a directory named "rcomp/results" should exist
+    And the exit status should be 0
+
+  @basic-conf
   Scenario: Test with single test skipped
     Given a file named "rcomp/tests/test1.test" with:
       """
