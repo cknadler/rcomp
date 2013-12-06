@@ -57,7 +57,6 @@ module RComp
     # Returns a boolean
     def root_subdirs_exist?
       File.exists?(@@conf.test_root) && 
-      File.exists?(@@conf.result_root) && 
       File.exists?(@@conf.expected_root)
     end
 
